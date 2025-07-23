@@ -1,4 +1,5 @@
-﻿using API.DTOs.Account;
+﻿using API.DTOs;
+using API.DTOs.Account;
 using API.Extensions;
 using API.Models;
 using API.Services.IServices;
@@ -15,24 +16,19 @@ using System.Threading.Tasks;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class AccountController : ControllerBase
+    public class AccountController : ApiCoreController
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly ITokenService _tokenService;
-        private readonly IConfiguration _config;
 
         public AccountController(UserManager<AppUser> userManager,
             SignInManager<AppUser> signInManager,
-            ITokenService tokenService,
-            IConfiguration config)
+            ITokenService tokenService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenService = tokenService;
-            _config = config;
         }
 
         [Authorize]
@@ -46,7 +42,7 @@ namespace API.Controllers
             if (user == null)
             {
                 RemoveJwtCookie();
-                return Unauthorized();
+                return Unauthorized(new ApiResponse(401));
             }
 
             return CreateAppUserDto(user);
@@ -72,14 +68,21 @@ namespace API.Controllers
                     .FirstOrDefaultAsync();
             }
 
-            if (user == null) return Unauthorized("Invalid username or password");
+            if (user == null) return Unauthorized(new ApiResponse(401, message: "Invalid username or password"));
 
-            var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
+            var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, true);
 
             if (!result.Succeeded)
             {
                 RemoveJwtCookie();
-                return Unauthorized("Invalid username or password");
+
+                if (result.IsLockedOut)
+                {
+                    return Unauthorized(new ApiResponse(401, title: "Account Locked",
+                        message: SD.AccountLockedMessage(user.LockoutEnd.Value.DateTime), isHtmlEnabled: true, displayByDefault: true));
+                }
+
+                return Unauthorized(new ApiResponse(401, message: "Invalid username or password"));
             }
 
             return CreateAppUserDto(user);
@@ -90,25 +93,41 @@ namespace API.Controllers
         {
             if (await CheckEmailExistsAsync(model.Email))
             {
-                return BadRequest($"An account has been registered with '{model.Email}'. Please try using another email address");
+                return BadRequest(new ApiResponse(400,
+                    message: $"An account has been registered with '{model.Email}'. Please try using another email address"));
             }
 
-            if (await CheckUsernameExistsAsync(model.UserName))
+            if (await CheckNameExistsAsync(model.Name))
             {
-                return BadRequest($"An account has been registered with '{model.UserName}'. Please try using another username");
+                return BadRequest(new ApiResponse(400,
+                    message: $"An account has been registered with '{model.Name}'. Please try using another name (username)"));
             }
 
             var userToAdd = new AppUser
             {
-                UserName = model.UserName,
+                Name = model.Name,
+                UserName = model.Name.ToLower(),
                 Email = model.Email,
-                EmailConfirmed = true
+                EmailConfirmed = true,
+                LockoutEnabled = true
             };
 
             var result = await _userManager.CreateAsync(userToAdd, model.Password);
             if (!result.Succeeded) return BadRequest(result.Errors);
 
-            return Ok("Your account has been created, you can login");
+            return Ok(new ApiResponse(200, message: "Your account has been created, you can login"));
+        }
+
+        [HttpGet("name-taken")]
+        public async Task<IActionResult> NameTaken([FromQuery] string name)
+        {
+            return Ok(new { IsTaken = await CheckNameExistsAsync(name) });
+        }
+
+        [HttpGet("email-taken")]
+        public async Task<IActionResult> EmailTaken([FromQuery] string email)
+        {
+            return Ok(new { IsTaken = await CheckEmailExistsAsync(email) });
         }
 
         [Authorize]
@@ -127,7 +146,7 @@ namespace API.Controllers
 
             return new AppUserDto
             {
-                UserName = user.UserName,
+                Name = user.Name,
                 JWT = jwt,
             };
         }
@@ -138,7 +157,7 @@ namespace API.Controllers
                 IsEssential = true,
                 HttpOnly = true,
                 Secure = true,
-                Expires = DateTime.UtcNow.AddDays(int.Parse(_config["JWT:ExpiresInDays"])),
+                Expires = DateTime.UtcNow.AddDays(int.Parse(Configuration["JWT:ExpiresInDays"])),
                 SameSite = SameSiteMode.None,
             };
 
@@ -152,9 +171,9 @@ namespace API.Controllers
         {
             return await _userManager.Users.AnyAsync(x => x.Email == email);
         }
-        private async Task<bool> CheckUsernameExistsAsync(string username)
+        private async Task<bool> CheckNameExistsAsync(string name)
         {
-            return await _userManager.Users.AnyAsync(x => x.UserName == username);
+            return await _userManager.Users.AnyAsync(x => x.UserName == name.ToLower());
         }
         #endregion
     }

@@ -26,6 +26,7 @@ namespace API.Services
             var userClaims = new List<Claim>
             {
                 new Claim(SD.UserId, user.Id.ToString()),
+                new Claim(SD.Name, user.Name),
                 new Claim(SD.UserName, user.UserName),
                 new Claim(SD.Email, user.Email),
             };

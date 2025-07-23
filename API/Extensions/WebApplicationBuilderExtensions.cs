@@ -1,4 +1,5 @@
 ﻿using API.Data;
+using API.DTOs;
 using API.Models;
 using API.Services;
 using API.Services.IServices;
@@ -6,11 +7,13 @@ using API.Utility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,6 +29,21 @@ namespace API.Extensions
             });
 
             builder.Services.AddScoped<ITokenService, TokenService>();
+            builder.Services.AddCors();
+
+            builder.Services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.InvalidModelStateResponseFactory = actionContext =>
+                {
+                    var errors = actionContext.ModelState
+                    .Where(e => e.Value.Errors.Count > 0)
+                    .SelectMany(x => x.Value.Errors)
+                    .Select(x => x.ErrorMessage).ToArray();
+
+                    var errorResponse = new ApiResponse(400, errors: errors);
+                    return new BadRequestObjectResult(errorResponse);
+                };
+            });
 
             return builder;
         }

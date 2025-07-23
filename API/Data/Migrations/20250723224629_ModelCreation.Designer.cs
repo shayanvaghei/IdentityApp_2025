@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Data.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20250604231618_ModelCreation")]
+    [Migration("20250723224629_ModelCreation")]
     partial class ModelCreation
     {
         /// <inheritdoc />
@@ -88,6 +88,10 @@ namespace API.Data.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)

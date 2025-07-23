@@ -10,6 +10,10 @@ namespace API.Extensions
             var userIdClaim = user.FindFirst(SD.UserId)?.Value;
             return int.TryParse(userIdClaim, out int userId) ? userId : null;
         }
+        public static string GetName(this ClaimsPrincipal user)
+        {
+            return user.FindFirst(SD.Name)?.Value;
+        }
         public static string GetUserName(this ClaimsPrincipal user)
         {
             return user.FindFirst(SD.UserName)?.Value;
