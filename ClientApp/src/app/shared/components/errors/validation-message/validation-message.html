@@ -1,0 +1,9 @@
+@if (errorMessages) {
+    <ul class="text-danger">
+        @for (error of errorMessages; track $index) {
+            <li>
+                {{error}}
+            </li>
+        }
+    </ul>
+}
