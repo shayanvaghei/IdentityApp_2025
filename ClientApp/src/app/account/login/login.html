@@ -1,1 +1,41 @@
-<p>login works!</p>
+<form [formGroup]="form" (ngSubmit)="login()" autocomplete="off">
+    <div class="container border p-4">
+        <div class="row text-center">
+            <h1>Login</h1>
+        </div>
+        <div class="row">
+            <div class="col-12 col-md-6 offset-md-3 pb-3">
+                <label for="userName">Username</label>
+                <input formControlName="userName" type="text" class="form-control" placeholder=""
+                    [class.is-invalid]="submitted && form.get('userName')?.hasError('required')" />
+                @if (submitted && form.get('userName')?.hasError('required')) {
+                <div class="text-danger">
+                    Username is required
+                </div>
+                }
+            </div>
+            <div class="col-12 col-md-6 offset-md-3 pb-3">
+                <label for="password">Password</label>
+                <input formControlName="password" type="password" class="form-control" placeholder=""
+                    [class.is-invalid]="submitted && form.get('password')?.hasError('required')" />
+                @if (submitted && form.get('password')?.hasError('required')) {
+                <div class="text-danger">
+                    Password is required
+                </div>
+                }
+            </div>
+
+            @if (errorMessages.length > 0) {
+            <div class="col-12 col-md-6 offset-md-3 pb-3">
+                <app-validation-message [errorMessages]="errorMessages"></app-validation-message>
+            </div>
+            }
+
+            <div class="col-12 col-md-6 offset-md-3 pb-3">
+                <div class="d-grid mt-4 px-1">
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

@@ -1,1 +1,114 @@
-<p>register works!</p>
+<form [formGroup]="form" (ngSubmit)="register()" autocomplete="off">
+    <div class="container border p-4">
+        <div class="row text-center">
+            <h1>Register</h1>
+        </div>
+        <div class="row">
+            <div class="col-12 col-md-6 offset-md-3 pb-3 position-relative">
+                <label for="name">
+                    Name (Username)
+                </label>
+                <input formControlName="name" type="text" class="form-control" placeholder=""
+                    [class.is-invalid]="(submitted || form.get('name')?.dirty) && form.get('name')?.errors"
+                    [class.is-valid]="form.get('name')?.status === 'VALID'" />
+                @if (form.get('name')?.status === 'PENDING') {
+                <div class="position-absolute top-50 start-50 translate-middle">
+                    <span>Checking...</span>
+                </div>
+                } @else if((submitted || form.get('name')?.dirty) && form.get('name')?.hasError('required')) {
+                <div class="invalid-feedback">
+                    Name is required
+                </div>
+
+                } @else if((submitted || form.get('name')?.dirty) &&
+                form.get('name')?.hasError('minlength') || form.get('name')?.hasError('maxlength')) {
+                <div class="invalid-feedback">
+                    Name must be at least 3, and maximum 15 characters
+                </div>
+                } @else if ((submitted || form.get('name')?.dirty) &&
+                form.get('name')?.hasError('pattern')) {
+                <div class="invalid-feedback">
+                    Name must contain only a-z A-Z 0-9 characters
+                </div>
+                } @else if (form.get('name')?.dirty &&
+                form.get('name')?.hasError('nameTaken')) {
+                <div class="invalid-feedback">
+                    Name is already taken. Please choose a different one.
+                </div>
+                }
+            </div>
+            <div class="col-12 col-md-6 offset-md-3 pb-3 position-relative">
+                <label for="email">
+                    Email
+                </label>
+                <input formControlName="email" type="text" class="form-control" placeholder=""
+                    [class.is-invalid]="(submitted || form.get('email')?.dirty) && form.get('email')?.errors"
+                    [class.is-valid]="form.get('email')?.status === 'VALID'" />
+                @if (form.get('email')?.status === 'PENDING') {
+                <div class="position-absolute top-50 start-50 translate-middle">
+                    <span>Checking...</span>
+                </div>
+                } @else if((submitted || form.get('email')?.dirty) && form.get('email')?.hasError('required')) {
+                <div class="invalid-feedback">
+                    Email is required
+                </div>
+
+                } @else if ((submitted || form.get('email')?.dirty) &&
+                form.get('email')?.hasError('pattern')) {
+                <div class="invalid-feedback">
+                    Invalid email address
+                </div>
+                } @else if (form.get('email')?.dirty &&
+                form.get('email')?.hasError('emailTaken')) {
+                <div class="invalid-feedback">
+                    Email is already taken. Please choose a different one.
+                </div>
+                }
+            </div>
+            <div class="col-12 col-md-6 offset-md-3 pb-3 position-relative">
+                <label for="password">
+                    Password
+                </label>
+                <input formControlName="password" type="password" class="form-control" placeholder=""
+                    [class.is-invalid]="submitted && form.get('password')?.errors" />
+                @if(submitted && form.get('password')?.hasError('required')) {
+                <div class="invalid-feedback">
+                    Password is required
+                </div>
+                } @else if (submitted && (form.get('password')?.hasError('minlength')
+                || form.get('password')?.hasError('maxlength'))) {
+                <div class="invalid-feedback">
+                    Password must be at least 6, and maximum 15 characters
+                </div>
+                }
+            </div>
+            <div class="col-12 col-md-6 offset-md-3 pb-3 position-relative">
+                <label for="confirmPassword">
+                    Confirm Password
+                </label>
+                <input formControlName="confirmPassword" type="password" class="form-control" placeholder=""
+                    [class.is-invalid]="submitted && form.get('confirmPassword')?.errors" />
+                @if(submitted && form.get('confirmPassword')?.hasError('required')) {
+                <div class="invalid-feedback">
+                    Confirm password is required
+                </div>
+                } @else if (submitted && form.get('confirmPassword')?.hasError('notMatching')) {
+                <div class="invalid-feedback">
+                    Confirm password does not match the password.
+                </div>
+                }
+            </div>
+            @if (errorMessages.length > 0) {
+            <div class="col-12 col-md-6 offset-md-3 pb-3">
+                <app-validation-message [errorMessages]="errorMessages"></app-validation-message>
+            </div>
+            }
+
+            <div class="col-12 col-md-6 offset-md-3 pb-3">
+                <div class="d-grid mt-4 px-1">
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">Create Account</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

@@ -14,13 +14,27 @@
                         Home
                     </a>
                 </li>
+                @if (accountService.$user()) {
                 <li class="nav-item">
                     <a class="nav-link" routerLink="/play" routerLinkActive="active">
                         Play
                     </a>
                 </li>
+                }
             </ul>
 
+            @if (accountService.$user(); as user) {
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <span class="h4 text-warning me-2">
+                        {{user.name}}
+                    </span>
+                    <a class="btn btn-secondary" (click)="logout()">
+                        <i class="bi bi-box-arrow-in-left"></i> Logout
+                    </a>
+                </li>
+            </ul>
+            } @else {
             <ul class="navbar-nav">
                 <li class="nav-item">
                     <a class="btn btn-secondary me-2" routerLink="/account/register" routerLinkActive="active">
@@ -33,6 +47,7 @@
                     </a>
                 </li>
             </ul>
+            }
         </div>
     </div>
 </nav>
