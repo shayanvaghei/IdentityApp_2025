@@ -30,7 +30,13 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         }
 
         if (error.status === 401) {
-          sharedService.showNotification(apiResponse);
+          if (apiResponse.displayByDefault) {
+            if (apiResponse.showWithToastr) {
+              toastr.error(apiResponse.message);
+            } else {
+              sharedService.showNotification(apiResponse);
+            }
+          }
         }
 
         if (error.status === 403) {

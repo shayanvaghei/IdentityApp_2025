@@ -1,0 +1,61 @@
+@if (mode) {
+<form [formGroup]="form" (ngSubmit)="sendEmail()" autocomplete="off">
+    <div class="container border p-4">
+        <div class="row text-center">
+            <h1>
+                @if (mode.includes('resend-confirmation-email')) {
+                Resend confirmation email
+                } @else {
+                Forgot username or passowrd
+                }
+            </h1>
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-md-6 offset-md-3 pb-3">
+                <label for="email">
+                    Your email
+                </label>
+                <input formControlName="email" type="text" class="form-control"
+                    [class.is-invalid]="submitted && form.get('email')?.errors" />
+                @if (submitted && form.get('email')?.hasError('required')) {
+                <div class="invalid-feedback">
+                    Email is required
+                </div>
+                } @else if (submitted && form.get('email')?.hasError('pattern')) {
+                <div class="invalid-feedback">
+                    Invalid email address
+                </div>
+                }
+            </div>
+
+            @if (errorMessages.length > 0) {
+            <div class="col-12 col-md-6 offset-md-3 pb-3">
+                <app-validation-message [errorMessages]="errorMessages"></app-validation-message>
+            </div>
+            }
+
+            <div class="row">
+                <div class="col-12 col-md-6 offset-md-3">
+                    <div class="row">
+                        <div class="col">
+                            <div class="d-grid">
+                                <button class="btn btn-block btn-danger" type="button" routerLink="/account/login">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="d-grid">
+                                <button class="btn btn-block btn-primary" type="submit">
+                                    Send
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+}

@@ -2,17 +2,19 @@ import { Component, OnInit } from '@angular/core';
 import { AbstractControl, AsyncValidatorFn, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { ValidationMessage } from '../../shared/components/errors/validation-message/validation-message';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AccountService } from '../account.service';
 import { SharedService } from '../../shared/shared.service';
 import { map, of, switchMap, timer } from 'rxjs';
+import { matchValues } from '../../shared/sharedHelper';
 
 @Component({
   selector: 'app-register',
   imports: [
     ReactiveFormsModule,
     ValidationMessage,
-    CommonModule
+    CommonModule,
+    RouterLink
   ],
   templateUrl: './register.html',
   styleUrl: './register.scss'
@@ -42,7 +44,7 @@ export class Register implements OnInit {
       Validators.pattern('^[a-zA-Z][a-zA-Z0-9]*$')], [this.checkNameNotTaken()]],
       email: ['', [Validators.required, Validators.pattern('^.+@[^\\.].*\\.[a-z]{2,}$')], [this.checkEmailNotTaken()]],
       password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(15)]],
-      confirmPassword: ['', [Validators.required, this.matchValues('password')]]
+      confirmPassword: ['', [Validators.required, matchValues('password')]]
     });
 
     this.form.controls['password'].valueChanges.subscribe({
@@ -58,9 +60,13 @@ export class Register implements OnInit {
       this.accountService.register(this.form.value).subscribe({
         next: response => {
           this.sharedService.showNotification(response);
-          this.router.navigateByUrl('/');
+          this.router.navigate(['/account/confirm-email'], {
+            queryParams: {
+              email: this.form.get('email')?.value
+            }
+          });
         },
-        error : error => {
+        error: error => {
           if (error.errors) {
             this.errorMessages = error.errors;
           }
@@ -111,12 +117,6 @@ export class Register implements OnInit {
           )
         })
       )
-    }
-  }
-
-  private matchValues(matchTo: string): ValidatorFn {
-    return (control: AbstractControl) => {
-      return control.value === control.parent?.get(matchTo)?.value ? null : { notMatching: true };
     }
   }
   // #endregion

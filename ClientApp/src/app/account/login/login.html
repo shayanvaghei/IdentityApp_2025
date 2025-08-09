@@ -31,10 +31,24 @@
             </div>
             }
 
+            @if (displayResendConfirmationLink) {
+            <div class="text-center">
+                <a routerLink="/account/send-email/resend-confirmation-email" class="btn btn-link">
+                    Didn't get a code? Click here!
+                </a>
+            </div>
+            }
+
             <div class="col-12 col-md-6 offset-md-3 pb-3">
                 <div class="d-grid mt-4 px-1">
                     <button type="submit" class="btn btn-primary btn-lg btn-block">Login</button>
                 </div>
+            </div>
+
+            <div class="mt-3 d-flex justify-content-center">
+                <a class="btn btn-link" routerLink="/account/send-email/forgot-username-or-password">
+                    Forgot username or password
+                </a>
             </div>
         </div>
     </div>

@@ -79,6 +79,11 @@ namespace API.Controllers
                     return Unauthorized(new ApiResponse(401, title: "Account Locked",
                         message: SD.AccountLockedMessage(user.LockoutEnd.Value.DateTime), isHtmlEnabled: true, displayByDefault: true));
                 }
+                else if (result.IsNotAllowed && !user.EmailConfirmed)
+                {
+                    return Unauthorized(new ApiResponse(401, title: SM.T_ConfirmEmailFirst, message: SM.M_ConfirmEmailFirst,
+                        displayByDefault: true));
+                }
 
                 return Unauthorized(new ApiResponse(401, message: "Invalid username or password"));
             }

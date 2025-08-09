@@ -7,6 +7,8 @@ import { AuthStatusModel, UserModel } from '../shared/models/account/user_m';
 import { map } from 'rxjs';
 import { RegisterModel } from '../shared/models/account/register_m';
 import { ApiResponse } from '../shared/models/apiResponse_m';
+import { ConfirmEmailModel, EmailModel } from '../shared/models/account/confirmEmail_m';
+import { ResetPasswordModel } from '../shared/models/account/resetPassword_m';
 
 @Injectable({
   providedIn: 'root'
@@ -63,6 +65,22 @@ export class AccountService {
           this.$user.set(null);
           this.route.navigateByUrl('/');
         }));
+  }
+
+  confirmEmail(model: ConfirmEmailModel) {
+    return this.http.put<ApiResponse<any>>(this.apiUrl + 'account/confirm-email', model);
+  }
+
+  resendConfirmationEmail(model: EmailModel) {
+    return this.http.post<ApiResponse<any>>(this.apiUrl + 'account/resend-confirmation-email', model);
+  }
+
+  forgotUsernameOrPassword(model: EmailModel) {
+    return this.http.post<ApiResponse<any>>(this.apiUrl + 'account/forgot-username-or-password', model);
+  }
+
+  resetPassword(model: ResetPasswordModel) {
+    return this.http.put<ApiResponse<any>>(this.apiUrl + 'account/reset-password', model);
   }
 
   // #region Private Methods
