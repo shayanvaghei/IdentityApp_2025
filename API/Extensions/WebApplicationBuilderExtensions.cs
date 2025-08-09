@@ -28,7 +28,7 @@ namespace API.Extensions
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
 
-            builder.Services.AddScoped<ITokenService, TokenService>();
+            builder.Services.AddScoped<IServiceUnitOfWork, ServiceUnitOfWork>();
             builder.Services.AddCors();
 
             builder.Services.Configure<ApiBehaviorOptions>(options =>

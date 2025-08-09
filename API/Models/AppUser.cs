@@ -14,5 +14,6 @@ namespace API.Models
 
         // Navigations
         public ICollection<AppUserRoleBridge> Roles { get; set; }
+        public ICollection<AppUserToken> Tokens { get; set; }
     }
 }
