@@ -1,0 +1,96 @@
+@if (accountService.$user(); as user) {
+<div class="d-lg-flex">
+    <nav class="d-lg-none mb-2">
+        <div class="row">
+            <div class="col d-grid">
+                <button class="btn" [ngClass]="page == 'edit-profile' ? 'btn-primary active-sm' : 'btn-secondary'"
+                    routerLink="/my-profile/edit-profile" (click)="navigate('edit-profile')">
+                    <i class="bi bi-person-circle"></i>
+                </button>
+            </div>
+            <div class="col d-grid">
+                <button class="btn" [ngClass]="page == 'change-password' ? 'btn-primary active-sm' : 'btn-secondary'"
+                    routerLink="/my-profile/change-password" (click)="navigate('change-password')">
+                    <i class="bi bi-lock-fill"></i>
+                </button>
+            </div>
+            <div class="col d-grid">
+                <button class="btn" [ngClass]="page == 'mfa-setup' ? 'btn-primary active-sm' : 'btn-secondary'"
+                    routerLink="/my-profile/mfa-setup" (click)="navigate('mfa-setup')">
+                    <i class="bi bi-house-lock-fill"></i>
+                </button>
+            </div>
+            <div class="col d-grid">
+                <button class="btn" [ngClass]="page == 'delete-account' ? 'btn-primary active-sm' : 'btn-secondary'"
+                    routerLink="/my-profile/delete-account" (click)="navigate('delete-account')">
+                    <i class="bi bi-trash3-fill"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <nav class="px-1 bg-body-tertiary rounded d-none d-lg-block me-1 border" style="width: 270px; min-height: 700px;">
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li class="nav-item">
+                <a class="nav-link link-body-emphasis pointer" routerLink="/my-profile/edit-profile"
+                    (click)="navigate('edit-profile')">
+                    <strong>{{user.name}}</strong>
+                </a>
+            </li>
+            <li>
+                <hr />
+            </li>
+            <li class="nav-item">
+                <a class="nav-link link-body-emphasis pointer" [class.active-lg]="page == 'edit-profile'"
+                    routerLink="/my-profile/edit-profile" (click)="navigate('edit-profile')">
+                    <i class="bi bi-person-circle"></i>
+                    <span class="nav-text">
+                        My Profile
+                    </span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link link-body-emphasis pointer" [class.active-lg]="page == 'change-password'"
+                    routerLink="/my-profile/change-password" (click)="navigate('change-password')">
+                    <i class="bi bi-lock-fill"></i>
+                    <span class="nav-text">
+                        Change Password
+                    </span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link link-body-emphasis pointer" [class.active-lg]="page == 'mfa-setup'"
+                    routerLink="/my-profile/mfa-setup" (click)="navigate('mfa-setup')">
+                    <i class="bi bi-house-lock-fill"></i>
+                    <span class="nav-text">
+                        MFA Setup
+                    </span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link link-body-emphasis pointer" [class.active-lg]="page == 'delete-account'"
+                    routerLink="/my-profile/delete-account" (click)="navigate('delete-account')">
+                    <i class="bi bi-trash3-fill"></i>
+                    <span class="nav-text">
+                        Delete Account
+                    </span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="rounded" style="width: 100%;">
+        <div class="card" style="min-height: 700px;">
+            @if (page === 'edit-profile') {
+            <app-edit-profile></app-edit-profile>
+            } @else if (page === 'change-password') {
+            <app-change-password></app-change-password>
+            } @else if(page === 'mfa-setup') {
+            <app-mfa-setup></app-mfa-setup>
+            } @else {
+            <app-delete-account></app-delete-account>
+            }
+        </div>
+    </div>
+</div>
+}

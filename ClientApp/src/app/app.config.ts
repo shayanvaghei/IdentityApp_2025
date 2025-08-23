@@ -18,7 +18,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     provideToastr({
       timeOut: 3000,
-      positionClass: 'toastr-top-right',
+      positionClass: 'toast-bottom-right',
       preventDuplicates: true
     }),
     provideHttpClient(withInterceptors([credentialInterceptor, errorInterceptor])),

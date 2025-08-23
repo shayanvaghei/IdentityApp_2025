@@ -26,7 +26,7 @@
             @if (accountService.$user(); as user) {
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <span class="h4 text-warning me-2">
+                    <span class="h4 text-warning me-2 pointer" routerLink="/my-profile/edit-profile">
                         {{user.name}}
                     </span>
                     <a class="btn btn-secondary" (click)="logout()">

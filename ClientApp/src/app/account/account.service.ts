@@ -83,9 +83,7 @@ export class AccountService {
     return this.http.put<ApiResponse<any>>(this.apiUrl + 'account/reset-password', model);
   }
 
-  // #region Private Methods
-  private setUser(user: UserModel) {
+  setUser(user: UserModel | null) {
     this.$user.set(user);
   }
-  // #endregion
 }

@@ -1,0 +1,46 @@
+@if (type && label) {
+<div class="row">
+    <div class="col-12 col-lg-6 pb-3">
+        <label for="{{label}}">
+            {{label}}
+        </label>
+        <div class="input-group">
+            <input [formControl]="control" [type]="type === 'password' && 
+            !displayPassword ? 'password' : (type === 'password' && displayPassword ? 'text': type)"
+                class="form-control" [class.is-invalid]="submitted && control.invalid" />
+            @if (type === 'password') {
+            <span class="input-group-text pointer" (click)="togglePasswordDisplay()">
+                <i class="bi" [ngClass]="displayPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+            </span>
+            }
+        </div>
+        @if (submitted && control.hasError('required')) {
+        <div class="text-danger">
+            {{label}} is required
+        </div>
+        } @else if (submitted && (control.hasError('minlength') || control.hasError('maxlength'))) {
+        <div class="text-danger">
+            {{label}} must be at least
+            {{minLength}}, and maximum
+            {{maxLength}} characters
+        </div>
+        } @else if (submitted && control.hasError('notMatching')) {
+        <div class="text-danger">
+            @if (invalidMessage) {
+            {{invalidMessage}}
+            } @else {
+            {{label}} does not match the password
+            }
+        </div>
+        } @else if (submitted && control.hasError('pattern')) {
+        <div class="text-danger">
+            @if (invalidMessage) {
+            {{invalidMessage}}
+            } @else {
+            Invalid {{label}}
+            }
+        </div>
+        }
+    </div>
+</div>
+}

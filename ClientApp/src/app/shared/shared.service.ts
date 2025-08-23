@@ -3,6 +3,8 @@ import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ApiResponse } from './models/apiResponse_m';
 import { Notification } from './components/modals/notification/notification';
+import { Observable } from 'rxjs';
+import { ConfirmBox } from './components/modals/confirm-box/confirm-box';
 
 @Injectable({
   providedIn: 'root'
@@ -36,6 +38,26 @@ export class SharedService {
       modalRef.componentInstance.message = apiResponse.message;
       modalRef.componentInstance.isHtmlEnabled = apiResponse.isHtmlEnabled;
     }
+  }
+
+  confirmBox(message: string, backdrop: boolean = false): Observable<boolean> {
+    const options: NgbModalOptions = {
+      backdrop
+    };
+
+    const modalRef = this.modalService.open(ConfirmBox, options);
+    modalRef.componentInstance.message = message;
+
+    return new Observable<boolean>((observable) => {
+      modalRef.result
+        .then((result) => {
+          observable.next(result);
+          observable.complete();
+        }).catch(() => {
+          observable.next(false);
+          observable.complete();
+        })
+    })
   }
   
 }

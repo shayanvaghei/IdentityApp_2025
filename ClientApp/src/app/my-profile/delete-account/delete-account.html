@@ -1,0 +1,42 @@
+<div class="card-header">
+    <span>Delete Account</span>
+</div>
+<div class="card-body">
+    <form [formGroup]="form" (ngSubmit)="save()" autocomplete="off">
+        <app-form-input [formControl]="$any(form.controls['currentUserName'])" [type]="'text'"
+            [label]="'Current Username'" [submitted]="submitted"></app-form-input>
+
+        <app-form-input [formControl]="$any(form.controls['currentPassword'])" [type]="'password'"
+            [label]="'Current Password'" [submitted]="submitted"></app-form-input>
+
+        <div class="form-check">
+            <input formControlName="confirmation" class="form-check-input" type="checkbox"
+                [class.is-invalid]="submitted && form.get('confirmation')?.errors" />
+            <label class="form-check-label">
+                I confirm that I am deleting my user account and understand that this action is irreversible.
+            </label>
+        </div>
+
+        @if (errorMessages.length > 0) {
+        <div class="row">
+            <div class="col">
+                <app-validation-message [errorMessages]="errorMessages"></app-validation-message>
+            </div>
+        </div>
+        }
+
+        <div class="row mt-3">
+            <div class="col-lg-6 col">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="d-grid">
+                            <button class="btn btn-block btn-danger" type="submit">
+                                Delete Account
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
