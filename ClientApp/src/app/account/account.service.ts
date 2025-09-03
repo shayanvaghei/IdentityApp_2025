@@ -9,6 +9,7 @@ import { RegisterModel } from '../shared/models/account/register_m';
 import { ApiResponse } from '../shared/models/apiResponse_m';
 import { ConfirmEmailModel, EmailModel } from '../shared/models/account/confirmEmail_m';
 import { ResetPasswordModel } from '../shared/models/account/resetPassword_m';
+import { MfaVerifyModel } from '../shared/models/account/mfaVerify_m';
 
 @Injectable({
   providedIn: 'root'
@@ -39,7 +40,21 @@ export class AccountService {
     return this.http.post<UserModel>(this.apiUrl + 'account/login', model)
       .pipe(
         map((user: UserModel) => {
-          if (user) {
+          if (user && user.jwt) {
+            this.setUser(user);
+            return '';
+          } else {
+            return user.mfaToken;
+          }
+        })
+      );
+  }
+
+  mfaVerify(model: MfaVerifyModel) {
+    return this.http.post<UserModel>(this.apiUrl + 'account/mfa-verify', model)
+      .pipe(
+        map((user: UserModel) => {
+          if (user && user.jwt) {
             this.setUser(user);
           }
         })

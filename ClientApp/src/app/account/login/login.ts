@@ -57,11 +57,15 @@ export class Login implements OnInit {
 
     if (this.form.valid) {
       this.accountService.login(this.form.value).subscribe({
-        next: _ => {
-          if (this.returnUrl) {
-            this.router.navigateByUrl(this.returnUrl);
+        next: (mfaToken: string) => {
+          if (mfaToken === '') {
+            if (this.returnUrl) {
+              this.router.navigateByUrl(this.returnUrl);
+            } else {
+              this.router.navigateByUrl('/');
+            }
           } else {
-            this.router.navigateByUrl('/');
+            this.router.navigate(['/account/mfa-verify'], { queryParams: { mfaToken } });
           }
         },
         error: error => {

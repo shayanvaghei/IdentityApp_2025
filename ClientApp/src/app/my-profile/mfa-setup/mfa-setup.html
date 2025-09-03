@@ -1,1 +1,60 @@
-<p>mfa-setup works!</p>
+@if (completed == true) {
+<div class="card-header">
+    MFA Setup
+    @if (mfaEnabled) {
+    (<span class="text-success">Enabled</span>)
+    } @else {
+    (<span class="text-primary">Disabled</span>)
+    }
+</div>
+<div class="card-body">
+    <label class="mb-3">
+        @if(mfaEnabled) {
+        Disable your multi-factor authentication.
+        } @else{
+        Enable your multi-factor authentication by scanning the QR code below.
+        }
+    </label>
+    <form [formGroup]="form" (ngSubmit)="save()" autocomplete="off">
+        @if (mfaEnabled === false && qrCode) {
+        <div class="mb-2">
+            <qrcode [qrdata]="qrCode.uri" [width]="256" [errorCorrectionLevel]="'M'"></qrcode>
+        </div>
+
+        <div class="d-flex justify-content-left mb-2">
+            <app-code-input (fullCode)="fullCodeReceive($event)"></app-code-input>
+        </div>
+        }
+
+        <app-form-input [formControl]="$any(form.controls['currentPassword'])" [type]="'password'"
+            [label]="'Current Password'" [submitted]="submitted"></app-form-input>
+
+        @if (errorMessages.length > 0) {
+        <div class="row">
+            <div class="col">
+                <app-validation-message [errorMessages]="errorMessages"></app-validation-message>
+            </div>
+        </div>
+        }
+
+        <div class="row mt-3">
+            <div class="col-lg-6 col">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="d-grid">
+                            <button class="btn btn-block btn-primary" type="submit" [disabled]="form.invalid">
+                                @if( mfaEnabled == false) {
+                                Enable MFA
+                                } @else {
+                                Disable MFA
+                                }
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+}

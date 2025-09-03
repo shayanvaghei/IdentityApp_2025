@@ -2,15 +2,10 @@
 using API.DTOs.Account;
 using API.Extensions;
 using API.Models;
-using API.Services.IServices;
 using API.Utility;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;
 using System.Linq;
@@ -71,7 +66,17 @@ namespace API.Controllers
                     displayByDefault: true));
             }
 
-            return CreateAppUserDto(user);
+            if (user.TwoFactorEnabled)
+            {
+                return new AppUserDto
+                {
+                    MfaToken = Services.TokenService.CreateMfaToken(user.UserName)
+                };
+            }
+            else
+            {
+                return CreateAppUserDto(user);
+            }
         }
 
         [HttpPost("register")]
@@ -302,6 +307,48 @@ namespace API.Controllers
             await UserManager.AddPasswordAsync(user, model.NewPassword);
 
             return Ok(new ApiResponse(200, title: SM.T_PasswordRest, message: SM.M_PasswordRest));
+        }
+
+        [HttpPost("mfa-verify")]
+        public async Task<ActionResult<AppUserDto>> MfaVerify(MfaVerifyDto model)
+        {
+            var userName = Services.TokenService.GetUserNameFromMfaToken(model.MfaToken);
+            if (string.IsNullOrEmpty(userName))
+            {
+                RemoveJwtCookie();
+                return Unauthorized(new ApiResponse(401, message: "Invalid code!", displayByDefault: true));
+            }
+
+            var user = await UserManager.FindByNameAsync(userName);
+            if (user == null)
+            {
+                RemoveJwtCookie();
+                return Unauthorized(new ApiResponse(401, message: "Invalid code!", displayByDefault: true));
+            }
+
+            if (!await UserManager.GetTwoFactorEnabledAsync(user))
+            {
+                return BadRequest(new ApiResponse(400, message: "Multi-facotr authentication not enabled.", displayByDefault: true));
+            }
+
+            var userToken = await Context.UserTokens
+                .Where(x => x.UserId == user.Id && x.LoginProvider == SD.Authenticator && x.Name == SD.MFAS)
+                .FirstOrDefaultAsync();
+
+            if (userToken == null)
+            {
+                RemoveJwtCookie();
+                return Unauthorized(new ApiResponse(401, message: "Invalid code!", displayByDefault: true));
+            }
+
+            var isValid = Services.TokenService.ValidateCode(userToken.Value, model.Code);
+            if (!isValid)
+            {
+                RemoveJwtCookie();
+                return Unauthorized(new ApiResponse(401, message: "Invalid code!", displayByDefault: true));
+            }
+
+            return CreateAppUserDto(user);
         }
 
         #region Private Methods

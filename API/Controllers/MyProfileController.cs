@@ -141,5 +141,70 @@ namespace API.Controllers
             RemoveJwtCookie();
             return Ok(new ApiResponse(200, message: "Your user account has been permanently deleted.", displayByDefault: true));
         }
+
+        [HttpGet("mfa-status")]
+        public async Task<IActionResult> MfaStatus()
+        {
+            var isEnabled = await UserManager.Users
+                .Where(x => x.Id == User.GetUserId())
+                .Select(x => x.TwoFactorEnabled)
+                .FirstOrDefaultAsync();
+
+            return Ok(new { IsEnabled = isEnabled });
+        }
+
+        [HttpGet("qr-code")]
+        public ActionResult<QrCodeDto> GetQrCode()
+        {
+            return Services.TokenService.GenerateQrCode(User.GetEmail());
+        }
+
+        [HttpPut("mfa-enable")]
+        public async Task<ActionResult<ApiResponse>> MfaEnable(MfaEnableDto model)
+        {
+            var user = await UserManager.FindByNameAsync(User.GetUserName());
+            if (user == null) return NotFound();
+
+            var message = await UserPasswordValidationAsync(user, model.CurrentPassword);
+            if (!string.IsNullOrEmpty(message))
+            {
+                return Unauthorized(new ApiResponse(401, message: message, displayByDefault: true, isHtmlEnabled: true));
+            }
+
+            var isValid = Services.TokenService.ValidateCode(model.Secret, model.Code);
+            if (!isValid)
+            {
+                return BadRequest(new ApiResponse(400, message: "Invalid code, try again.", displayByDefault: true));
+            }
+
+            var result = await UserManager.SetTwoFactorEnabledAsync(user, true);
+            if (!result.Succeeded) return BadRequest(new ApiResponse(400, displayByDefault: true));
+
+            result = await UserManager.SetAuthenticationTokenAsync(user, SD.Authenticator, SD.MFAS, model.Secret);
+            if (!result.Succeeded) return BadRequest(new ApiResponse(400, displayByDefault: true));
+
+            return Ok(new ApiResponse(200, message: "Multi-factor authentication enabled"));
+        }
+
+        [HttpPut("mfa-disable")]
+        public async Task<ActionResult<ApiResponse>> MfaDisable(EditProfileBaseDto model)
+        {
+            var user = await UserManager.FindByNameAsync(User.GetUserName());
+            if (user == null) return NotFound();
+
+            var message = await UserPasswordValidationAsync(user, model.CurrentPassword);
+            if (!string.IsNullOrEmpty(message))
+            {
+                return Unauthorized(new ApiResponse(401, message: message, displayByDefault: true, isHtmlEnabled: true));
+            }
+
+            var result = await UserManager.SetTwoFactorEnabledAsync(user, false);
+            if (!result.Succeeded) return BadRequest(new ApiResponse(400, displayByDefault: true));
+
+            result = await UserManager.RemoveAuthenticationTokenAsync(user, SD.Authenticator, SD.MFAS);
+            if (!result.Succeeded) return BadRequest(new ApiResponse(400, displayByDefault: true));
+
+            return Ok(new ApiResponse(200, message: "Multi-factor authentication disabled."));
+        }
     }
 }
