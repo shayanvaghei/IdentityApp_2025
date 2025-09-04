@@ -351,6 +351,93 @@ namespace API.Controllers
             return CreateAppUserDto(user);
         }
 
+        [HttpPost("mfa-disable-request")]
+        public async Task<ActionResult<ApiResponse>> MfaDisableRequest(EmailDto model)
+        {
+            var user = await UserManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                // sending a vague response with a fake delay
+                PauseResponse();
+                return Ok(new ApiResponse(200, title: SM.T_EmailSent, message: SM.M_MfaDisableEmailSent));
+            }
+
+            if (!user.IsActive)
+            {
+                return Unauthorized(new ApiResponse(401, title: SM.T_AccountSuspended, message: SM.M_AccountSuspended,
+                    displayByDefault: true));
+            }
+
+            if (!user.EmailConfirmed)
+            {
+                return BadRequest(new ApiResponse(400, title: SM.T_ConfirmEmailFirst, message: SM.M_ConfirmEmailFirst,
+                    displayByDefault: true));
+            }
+
+            try
+            {
+                if (await SendMfaDisableEmail(user))
+                {
+                    return Ok(new ApiResponse(200, title: SM.T_EmailSent, message: SM.M_MfaDisableEmailSent));
+                }
+
+                return BadRequest(new ApiResponse(400, title: SM.T_EmailSentFailed, message: SM.M_EmailSentFailed,
+                    displayByDefault: true));
+            }
+            catch (Exception)
+            {
+                return BadRequest(new ApiResponse(400, title: SM.T_EmailSentFailed, message: SM.M_EmailSentFailed,
+                   displayByDefault: true));
+            }
+        }
+
+        [HttpPut("mfa-disable")]
+        public async Task<ActionResult<ApiResponse>> MfaDisable(MfaDisableDto model)
+        {
+            var user = await UserManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                return Unauthorized(new ApiResponse(401, title: SM.T_InvallidToken, message: SM.M_InavlidToken,
+                    displayByDefault: true));
+            }
+
+            if (!user.IsActive)
+            {
+                return Unauthorized(new ApiResponse(401, title: SM.T_AccountSuspended, message: SM.M_AccountSuspended,
+                    displayByDefault: true));
+            }
+
+            if (!user.EmailConfirmed)
+            {
+                return BadRequest(new ApiResponse(400, title: SM.T_ConfirmEmailFirst, message: SM.M_ConfirmEmailFirst,
+                    displayByDefault: true));
+            }
+
+            var appUserToken = await Context.AppUserTokens
+                .FirstOrDefaultAsync(x => x.UserId == user.Id && x.Name == SD.MFASDisable && x.Value == model.Token);
+            if (appUserToken == null || appUserToken.Expires <= DateTime.UtcNow)
+            {
+                if (appUserToken != null)
+                {
+                    Context.Remove(appUserToken);
+                    await Context.SaveChangesAsync();
+                }
+
+                return Unauthorized(new ApiResponse(401, title: SM.T_InvallidToken, message: SM.M_InavlidToken,
+                    displayByDefault: true));
+            }
+
+            Context.AppUserTokens.Remove(appUserToken);
+
+            var result = await UserManager.SetTwoFactorEnabledAsync(user, false);
+            if (!result.Succeeded) return BadRequest(new ApiResponse(400, displayByDefault: true));
+
+            result = await UserManager.RemoveAuthenticationTokenAsync(user, SD.Authenticator, SD.MFAS);
+            if (!result.Succeeded) return BadRequest(new ApiResponse(400, displayByDefault: true));
+
+            return Ok(new ApiResponse(200, message: "Multi-factor authentication disabled."));
+        }
+
         #region Private Methods
         private async Task<bool> SendForgotUsernameOrPasswordEmail(AppUser user)
         {
@@ -389,6 +476,48 @@ namespace API.Controllers
             var emailSend = new EmailSendDto(user.Email, "Forgot username or password", messageBody);
 
             return await Services.EmailService.SendEmailAsync(emailSend);
+        }
+        private async Task<bool> SendMfaDisableEmail(AppUser user)
+        {
+            var userToken = await Context.AppUserTokens
+                .FirstOrDefaultAsync(x => x.UserId == user.Id && x.Name == SD.MFASDisable);
+
+            var tokenExpiresInMinutes = TokenExpiresInMinutes();
+
+            if (userToken == null)
+            {
+                var userTokenToAdd = new AppUserToken
+                {
+                    UserId = user.Id,
+                    Name = SD.MFASDisable,
+                    Value = SD.GenerateRandomString(),
+                    Expires = DateTime.UtcNow.AddMinutes(tokenExpiresInMinutes),
+                    LoginProvider = string.Empty
+                };
+
+                Context.AppUserTokens.Add(userTokenToAdd);
+                userToken = userTokenToAdd;
+            }
+            else
+            {
+                userToken.Value = SD.GenerateRandomString();
+                userToken.Expires = DateTime.UtcNow.AddMinutes(tokenExpiresInMinutes);
+            }
+
+            using StreamReader streamReader = System.IO.File.OpenText("EmailTemplates/mfa_disable.html");
+            string htmlBody = streamReader.ReadToEnd();
+
+            string messageBody = string.Format(htmlBody, GetClientUrl(), user.Name,
+                user.UserName, user.Email, userToken.Value, tokenExpiresInMinutes);
+            var emailSend = new EmailSendDto(user.Email, "MFA Disable", messageBody);
+
+            if (await Services.EmailService.SendEmailAsync(emailSend))
+            {
+                await Context.SaveChangesAsync();
+                return true;
+            }
+
+            return false;
         }
         #endregion
     }

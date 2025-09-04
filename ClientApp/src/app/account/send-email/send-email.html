@@ -5,8 +5,10 @@
             <h1>
                 @if (mode.includes('resend-confirmation-email')) {
                 Resend confirmation email
-                } @else {
+                } @else if (mode.includes('forgot-username-or-password')) {
                 Forgot username or passowrd
+                } @else {
+                Disable MFA request
                 }
             </h1>
         </div>
@@ -22,7 +24,8 @@
                 <div class="invalid-feedback">
                     Email is required
                 </div>
-                } @else if (submitted && form.get('email')?.hasError('pattern')) {
+                } @else if (submitted && form.get('email')?.hasError('pattern'))
+                {
                 <div class="invalid-feedback">
                     Invalid email address
                 </div>
@@ -31,7 +34,8 @@
 
             @if (errorMessages.length > 0) {
             <div class="col-12 col-md-6 offset-md-3 pb-3">
-                <app-validation-message [errorMessages]="errorMessages"></app-validation-message>
+                <app-validation-message
+                    [errorMessages]="errorMessages"></app-validation-message>
             </div>
             }
 
@@ -40,14 +44,16 @@
                     <div class="row">
                         <div class="col">
                             <div class="d-grid">
-                                <button class="btn btn-block btn-danger" type="button" routerLink="/account/login">
+                                <button class="btn btn-block btn-danger"
+                                    type="button" routerLink="/account/login">
                                     Cancel
                                 </button>
                             </div>
                         </div>
                         <div class="col">
                             <div class="d-grid">
-                                <button class="btn btn-block btn-primary" type="submit">
+                                <button class="btn btn-block btn-primary"
+                                    type="submit">
                                     Send
                                 </button>
                             </div>

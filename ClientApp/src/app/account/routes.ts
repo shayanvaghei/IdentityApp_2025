@@ -5,6 +5,7 @@ import { ConfirmEmail } from "./confirm-email/confirm-email";
 import { SendEmail } from "./send-email/send-email";
 import { ResetPassword } from "./reset-password/reset-password";
 import { MfaVerify } from "./mfa-verify/mfa-verify";
+import { MfaDisable } from "./mfa-disable/mfa-disable";
 
 export const accountRoutes: Route[] = [
     { path: 'login', component: Login },
@@ -13,4 +14,5 @@ export const accountRoutes: Route[] = [
     { path: 'confirm-email', component: ConfirmEmail },
     { path: 'send-email/:mode', component: SendEmail },
     { path: 'reset-password', component: ResetPassword },
+    { path: 'mfa-disable', component: MfaDisable },
 ]
