@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../environments/environment.development';
+import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { ApiResponse } from '../shared/models/apiResponse_m';
 import { EditMyProfileModel } from '../shared/models/myProfile/editMyProfile_m';

@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\API.Utility\API.Utility.csproj" />
+	<None Update="EmailTemplates\**" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
