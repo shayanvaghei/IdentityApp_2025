@@ -88,7 +88,7 @@ namespace API.Controllers
             else
             {
                 await Context.SaveChangesAsync();
-                var appUserDto = CreateAppUserDto(user);
+                var appUserDto =  await CreateAppUserDtoAsync(user);
 
                 return Ok(new ApiResponse(200, message: "Your changes have been saved successfully.",
                     showWithToastr: true, displayByDefault: true, data: appUserDto));

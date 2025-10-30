@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace API.Utility
@@ -10,11 +11,31 @@ namespace API.Utility
         // Cookie
         public static readonly string IdentityAppCookie = "identityappcookie";
 
+        // Application roles
+        public const string AdminRole = "admin";
+        public const string UserRole = "user";
+        public const string ModeratorRole = "moderator";
+        public static readonly List<string> Roles = new List<string> { AdminRole, UserRole, ModeratorRole };
+
+        //Super admin
+        public const string SuperAdminUsername = "iaadmin";
+        public const string SuperAdminEmail = "iaadmin@example.com";
+
         // Application Claims
         public const string UserId = "uid";
         public const string Name = "name";
         public const string UserName = "username";
         public const string Email = "eml";
+
+        // Application Claims-Policy
+        public const string AdminPolicy = "AdminPolicy";
+        public const string ModeratorPolicy = "ModeratorPolicy";
+        public const string UserPolicy = "UserPolicy";
+        public const string AdminOrModeratorPolicy = "AdminOrModeratorPolicy";
+        public const string AdminAndModeratorPolicy = "AdminAndModeratorPolicy";
+        public const string AllRolePolicy = "AllRolePolicy";
+        public const string AdminEmailPolicy = "AdminEmailPolicy";
+        public const string VIPPolicy = "VIPPolicy";
 
 
         // Regext

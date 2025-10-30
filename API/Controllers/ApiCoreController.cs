@@ -60,9 +60,9 @@ namespace API.Controllers
 
             return null;
         }
-        protected AppUserDto CreateAppUserDto(AppUser user)
+        protected async Task<AppUserDto> CreateAppUserDtoAsync(AppUser user)
         {
-            string jwt = Services.TokenService.CreateJWT(user);
+            string jwt = await Services.TokenService.CreateJWTAsync(user);
             SetJWTCookie(jwt);
 
             return new AppUserDto

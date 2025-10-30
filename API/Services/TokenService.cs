@@ -2,6 +2,7 @@
 using API.Models;
 using API.Services.IServices;
 using API.Utility;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using OtpNet;
@@ -11,22 +12,26 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace API.Services
 {
     public class TokenService : ITokenService
     {
         private readonly IConfiguration _config;
+        private readonly UserManager<AppUser> _userManager;
         private readonly SymmetricSecurityKey _jwtKey;
         private readonly SymmetricSecurityKey _mfaKey;
 
-        public TokenService(IConfiguration config)
+        public TokenService(IConfiguration config,
+            UserManager<AppUser> userManager)
         {
             _config = config;
+            _userManager = userManager;
             _jwtKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:Key"]));
             _mfaKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["MFA:Key"]));
         }
-        public string CreateJWT(AppUser user)
+        public async Task<string> CreateJWTAsync(AppUser user)
         {
             var userClaims = new List<Claim>
             {
@@ -35,6 +40,11 @@ namespace API.Services
                 new Claim(SD.UserName, user.UserName),
                 new Claim(SD.Email, user.Email),
             };
+
+            // Adding roles to the claims
+            var fetchedUser = await _userManager.FindByNameAsync(user.UserName);
+            var roles = await _userManager.GetRolesAsync(user);
+            userClaims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
             var credentials = new SigningCredentials(_jwtKey, SecurityAlgorithms.HmacSha512Signature);
             var tokenDescriptor = new SecurityTokenDescriptor

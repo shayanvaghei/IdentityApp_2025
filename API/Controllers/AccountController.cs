@@ -29,7 +29,7 @@ namespace API.Controllers
                 return Unauthorized(new ApiResponse(401));
             }
 
-            return CreateAppUserDto(user);
+            return await CreateAppUserDtoAsync(user);
         }
 
         [HttpGet("auth-status")]
@@ -75,7 +75,7 @@ namespace API.Controllers
             }
             else
             {
-                return CreateAppUserDto(user);
+                return await CreateAppUserDtoAsync(user);
             }
         }
 
@@ -348,7 +348,7 @@ namespace API.Controllers
                 return Unauthorized(new ApiResponse(401, message: "Invalid code!", displayByDefault: true));
             }
 
-            return CreateAppUserDto(user);
+            return await CreateAppUserDtoAsync(user);
         }
 
         [HttpPost("mfa-disable-request")]

@@ -5,6 +5,7 @@ using API.Services;
 using API.Services.IServices;
 using API.Utility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -95,7 +97,33 @@ namespace API.Extensions
                 };
             });
 
+            // Policy creation
+            builder.Services.AddAuthorization(opt =>
+            {
+                opt.AddPolicy(SD.AdminPolicy, policy => policy.RequireRole(SD.AdminRole));
+                opt.AddPolicy(SD.ModeratorPolicy, policy => policy.RequireRole(SD.ModeratorRole));
+                opt.AddPolicy(SD.UserPolicy, policy => policy.RequireRole(SD.UserRole));
+
+                opt.AddPolicy(SD.AdminOrModeratorPolicy, policy => policy.RequireRole(SD.AdminRole, SD.ModeratorRole));
+                opt.AddPolicy(SD.AdminAndModeratorPolicy, policy => policy.RequireRole(SD.AdminRole).RequireRole(SD.ModeratorRole));
+                opt.AddPolicy(SD.AllRolePolicy, policy => policy.RequireRole(SD.AdminRole, SD.ModeratorRole, SD.UserRole));
+
+                opt.AddPolicy(SD.AdminEmailPolicy, policy => policy.RequireClaim(SD.Email, SD.SuperAdminEmail));
+                opt.AddPolicy(SD.VIPPolicy, policy => policy.RequireAssertion(context => VIPPolicy(context)));
+            });
+
             return builder;
+        }
+
+        public static bool VIPPolicy(AuthorizationHandlerContext context)
+        {
+            if (context.User.IsInRole(SD.UserRole) &&
+                context.User.HasClaim(c => c.Type == SD.Email && c.Value.Contains("vip")))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

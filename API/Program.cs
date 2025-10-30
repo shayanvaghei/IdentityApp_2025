@@ -53,8 +53,9 @@ async Task InitializeContextAsync()
     {
         var context = scope.ServiceProvider.GetService<Context>();
         var userManager = scope.ServiceProvider.GetService<UserManager<AppUser>>();
+        var roleManager = scope.ServiceProvider.GetService<RoleManager<AppRole>>();
 
-        await ContextInitializer.InitializeAsync(context, userManager);
+        await ContextInitializer.InitializeAsync(context, userManager, roleManager);
     }
     catch(Exception ex)
     {
