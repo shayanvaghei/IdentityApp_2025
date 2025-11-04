@@ -54,6 +54,12 @@ namespace API.Controllers
 
             if (user == null) return Unauthorized(new ApiResponse(401, message: "Invalid username or password", displayByDefault: true));
 
+            if (!user.IsActive)
+            {
+                return Unauthorized(new ApiResponse(401, title: SM.T_AccountSuspended, message: SM.M_AccountSuspended,
+                    displayByDefault: true));
+            }
+
             var message = await UserPasswordValidationAsync(user, model.Password);
             if (!string.IsNullOrEmpty(message))
             {
@@ -439,44 +445,6 @@ namespace API.Controllers
         }
 
         #region Private Methods
-        private async Task<bool> SendForgotUsernameOrPasswordEmail(AppUser user)
-        {
-            var userToken = await Context.AppUserTokens
-                .FirstOrDefaultAsync(x => x.UserId == user.Id && x.Name == SD.FUP);
-
-            var tokenExpiresInMinutes = TokenExpiresInMinutes();
-
-            if (userToken == null)
-            {
-                var userTokenToAdd = new AppUserToken
-                {
-                    UserId = user.Id,
-                    Name = SD.FUP,
-                    Value = SD.GenerateRandomString(),
-                    Expires = DateTime.UtcNow.AddMinutes(tokenExpiresInMinutes),
-                    LoginProvider = string.Empty
-                };
-
-                Context.AppUserTokens.Add(userTokenToAdd);
-                userToken = userTokenToAdd;
-            }
-            else
-            {
-                userToken.Value = SD.GenerateRandomString();
-                userToken.Expires = DateTime.UtcNow.AddMinutes(tokenExpiresInMinutes);
-            }
-
-            await Context.SaveChangesAsync();
-
-            using StreamReader streamReader = System.IO.File.OpenText("EmailTemplates/forgot_username_password.html");
-            string htmlBody = streamReader.ReadToEnd();
-
-            string messageBody = string.Format(htmlBody, GetClientUrl(), user.Name,
-                user.UserName, user.Email, userToken.Value, tokenExpiresInMinutes);
-            var emailSend = new EmailSendDto(user.Email, "Forgot username or password", messageBody);
-
-            return await Services.EmailService.SendEmailAsync(emailSend);
-        }
         private async Task<bool> SendMfaDisableEmail(AppUser user)
         {
             var userToken = await Context.AppUserTokens

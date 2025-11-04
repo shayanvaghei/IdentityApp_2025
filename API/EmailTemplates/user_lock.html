@@ -4,7 +4,7 @@
     </h1>
 </a>
 <div>
-    <h2>Reset Password Link</h2>
+    <h2>Account Lock Notification</h2>
     <p>
         Hello <strong>{1}</strong>,
     </p>
@@ -14,12 +14,16 @@
         Email: {3}
     </p>
     <p>
-        In order to reset your password, please click on the link bellow.<br />
-        <a href="{0}/account/reset-password?email={3}">Click here</a><br />
-        Enter the following code to verify:
+        We regret to inform you that your account has been
+        <strong style="color: red">locked</strong> due to suspicious activity
+        for the next
+        <strong>{4} days</strong>. As a result, all your ads will remain
+        inactive during this period.
     </p>
-    <h1>{4}</h1>
-    <p>The token expires in {5} minutes</p>
+    <p>
+        If you believe this action was taken in error or you would like more
+        information, please contact our support team using the link below.
+    </p>
     <hr />
     <p>
         <a href="{0}/privacy-policy">Privacy Policy</a>

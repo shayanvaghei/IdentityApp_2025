@@ -1,6 +1,7 @@
 ﻿using API.Data;
 using API.DTOs;
 using API.DTOs.Account;
+using API.Helpers;
 using API.Models;
 using API.Services.IServices;
 using API.Utility;
@@ -18,6 +19,7 @@ using System.Threading.Tasks;
 namespace API.Controllers
 {
     [Route("api/[controller]")]
+    [ServiceFilter(typeof(UserActivityFilter))]
     [ApiController]
     public class ApiCoreController : ControllerBase
     {
@@ -125,6 +127,44 @@ namespace API.Controllers
             }
 
             return false;
+        }
+        protected async Task<bool> SendForgotUsernameOrPasswordEmail(AppUser user)
+        {
+            var userToken = await Context.AppUserTokens
+                .FirstOrDefaultAsync(x => x.UserId == user.Id && x.Name == SD.FUP);
+
+            var tokenExpiresInMinutes = TokenExpiresInMinutes();
+
+            if (userToken == null)
+            {
+                var userTokenToAdd = new AppUserToken
+                {
+                    UserId = user.Id,
+                    Name = SD.FUP,
+                    Value = SD.GenerateRandomString(),
+                    Expires = DateTime.UtcNow.AddMinutes(tokenExpiresInMinutes),
+                    LoginProvider = string.Empty
+                };
+
+                Context.AppUserTokens.Add(userTokenToAdd);
+                userToken = userTokenToAdd;
+            }
+            else
+            {
+                userToken.Value = SD.GenerateRandomString();
+                userToken.Expires = DateTime.UtcNow.AddMinutes(tokenExpiresInMinutes);
+            }
+
+            await Context.SaveChangesAsync();
+
+            using StreamReader streamReader = System.IO.File.OpenText("EmailTemplates/forgot_username_password.html");
+            string htmlBody = streamReader.ReadToEnd();
+
+            string messageBody = string.Format(htmlBody, GetClientUrl(), user.Name,
+                user.UserName, user.Email, userToken.Value, tokenExpiresInMinutes);
+            var emailSend = new EmailSendDto(user.Email, "Forgot username or password", messageBody);
+
+            return await Services.EmailService.SendEmailAsync(emailSend);
         }
 
         protected int TokenExpiresInMinutes()

@@ -31,23 +31,36 @@ namespace API.Data
             if (!userManager.Users.Any())
             {
                 // 1. Super Admin
-                var admin = new AppUser
+                var superAdmin = new AppUser
                 {
-                    Name = "IA Admin",
+                    Name = "IAAdmin",
                     UserName = SD.SuperAdminUsername,
                     Email = SD.SuperAdminEmail,
                     EmailConfirmed = true,
                     LockoutEnabled = false
                 };
 
-                await userManager.CreateAsync(admin, SD.DefaultPassword);
-                await userManager.AddToRolesAsync(admin, [SD.AdminRole, SD.UserRole, SD.ModeratorRole]);
-                await userManager.AddClaimsAsync(admin, new Claim[]
+                await userManager.CreateAsync(superAdmin, SD.DefaultPassword);
+                await userManager.AddToRolesAsync(superAdmin, [SD.AdminRole, SD.UserRole, SD.ModeratorRole]);
+                await userManager.AddClaimsAsync(superAdmin, new Claim[]
                 {
-                    new Claim(SD.Email, admin.Email),
+                    new Claim(SD.Email, superAdmin.Email),
                 });
 
-                // 2. Moderator
+                // 2. John (Admin)
+                var john = new AppUser
+                {
+                    Name = "John",
+                    UserName = "john",
+                    Email = "john@example.com",
+                    EmailConfirmed = true,
+                    LockoutEnabled = true
+                };
+
+                await userManager.CreateAsync(john, SD.DefaultPassword);
+                await userManager.AddToRolesAsync(john, [SD.AdminRole, SD.UserRole, SD.ModeratorRole]);
+
+                // 3. Moderator
                 var moderator = new AppUser
                 {
                     Name = "Moderator",
@@ -57,21 +70,21 @@ namespace API.Data
                     LockoutEnabled = true,
                 };
                 await userManager.CreateAsync(moderator, SD.DefaultPassword);
-                await userManager.AddToRoleAsync(moderator, SD.ModeratorRole);
+                await userManager.AddToRolesAsync(moderator, [SD.UserRole, SD.ModeratorRole]);
 
-                // 3. John
-                var john = new AppUser
+                // 4. Les
+                var les = new AppUser
                 {
-                    Name = "JOHN",
-                    UserName = "john",
-                    Email = "john@example.com",
+                    Name = "LES",
+                    UserName = "les",
+                    Email = "les@example.com",
                     EmailConfirmed = true,
                     LockoutEnabled = true,
                 };
-                await userManager.CreateAsync(john, SD.DefaultPassword);
-                await userManager.AddToRoleAsync(john, SD.UserRole);
+                await userManager.CreateAsync(les, SD.DefaultPassword);
+                await userManager.AddToRoleAsync(les, SD.UserRole);
 
-                // 3. Peter
+                // 5. Peter
                 var peter = new AppUser
                 {
                     Name = "peTer",
@@ -83,7 +96,7 @@ namespace API.Data
                 await userManager.CreateAsync(peter, SD.DefaultPassword);
                 await userManager.AddToRoleAsync(peter, SD.UserRole);
 
-                // 4. Tom
+                // 6. Tom
                 var tom = new AppUser
                 {
                     Name = "tom",
@@ -95,7 +108,7 @@ namespace API.Data
                 await userManager.CreateAsync(tom, SD.DefaultPassword);
                 await userManager.AddToRoleAsync(tom, SD.UserRole);
 
-                // 5. Barb
+                // 7. Barb
                 var barb = new AppUser
                 {
                     Name = "barb",
@@ -107,7 +120,7 @@ namespace API.Data
                 await userManager.CreateAsync(barb, SD.DefaultPassword);
                 await userManager.AddToRoleAsync(barb, SD.UserRole);
 
-                // vipuser
+                // 8. vipuser
                 var vipuser = new AppUser
                 {
                     Name = "vipuser",
@@ -122,6 +135,97 @@ namespace API.Data
                 {
                     new Claim(SD.Email, vipuser.Email),
                 });
+
+                // 9. Mary
+                var mary = new AppUser
+                {
+                    Name = "Mary",
+                    Email = "mary@example.com",
+                    UserName = "mary",
+                    EmailConfirmed = true,
+                    LockoutEnabled = true
+                };
+
+                await userManager.CreateAsync(mary, SD.DefaultPassword);
+                await userManager.AddToRoleAsync(mary, SD.UserRole);
+
+                // 10. Sarah
+                var sarah = new AppUser
+                {
+                    Name = "Sarah",
+                    Email = "sarah@example.com",
+                    UserName = "sarah",
+                    EmailConfirmed = true,
+                    LockoutEnabled = true
+                };
+
+                await userManager.CreateAsync(sarah, SD.DefaultPassword);
+                await userManager.AddToRoleAsync(sarah, SD.UserRole);
+
+                // 11. Alice
+                var alice = new AppUser
+                {
+                    Name = "Alice",
+                    Email = "alice@example.com",
+                    UserName = "alice",
+                    EmailConfirmed = true,
+                    LockoutEnabled = true
+                };
+
+                await userManager.CreateAsync(alice, SD.DefaultPassword);
+                await userManager.AddToRoleAsync(alice, SD.UserRole);
+
+                // 12. Bob
+                var bob = new AppUser
+                {
+                    Name = "Bob",
+                    Email = "bob@example.com",
+                    UserName = "bob",
+                    EmailConfirmed = true,
+                    LockoutEnabled = true
+                };
+
+                await userManager.CreateAsync(bob, SD.DefaultPassword);
+                await userManager.AddToRoleAsync(bob, SD.UserRole);
+
+                // 13. Eve
+                var eve = new AppUser
+                {
+                    Name = "Eve",
+                    Email = "eve@example.com",
+                    UserName = "eve",
+                    EmailConfirmed = true,
+                    LockoutEnabled = true
+                };
+
+                await userManager.CreateAsync(eve, SD.DefaultPassword);
+                await userManager.AddToRoleAsync(eve, SD.UserRole);
+
+                // 14. Frank
+                var frank = new AppUser
+                {
+                    Name = "Frank",
+                    Email = "frank@example.com",
+                    UserName = "frank",
+                    EmailConfirmed = true,
+                    LockoutEnabled = true
+                };
+
+                await userManager.CreateAsync(frank, SD.DefaultPassword);
+                await userManager.AddToRoleAsync(frank, SD.UserRole);
+
+                // 15. Grace
+                var grace = new AppUser
+                {
+                    Name = "Grace",
+                    Email = "grace@example.com",
+                    UserName = "grace",
+                    EmailConfirmed = true,
+                    LockoutEnabled = true
+                };
+
+                await userManager.CreateAsync(grace, SD.DefaultPassword);
+                await userManager.AddToRoleAsync(grace, SD.UserRole);
             }
         }
     }

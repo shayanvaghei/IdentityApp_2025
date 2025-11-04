@@ -26,5 +26,6 @@
         public const string M_ConfirmEmailFirst = "Your account isn’t confirmed yet. Please confirm your email address first.";
         public const string M_PasswordRest = "Your password has been reset.";
         public const string M_MfaDisableEmailSent = "If an eligible account exists, we've sent mfa disable instructions to its primary email. Check your inbox or spam folder.";
+        public const string M_InvalidSelfAction = "You cannot view, edit, lock, unlock, activate, deactivate, or delete your own account.";
     }
 }

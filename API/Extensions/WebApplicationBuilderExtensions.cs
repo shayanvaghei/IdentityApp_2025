@@ -1,5 +1,6 @@
 ﻿using API.Data;
 using API.DTOs;
+using API.Helpers;
 using API.Models;
 using API.Services;
 using API.Services.IServices;
@@ -31,6 +32,7 @@ namespace API.Extensions
             });
 
             builder.Services.AddScoped<IServiceUnitOfWork, ServiceUnitOfWork>();
+            builder.Services.AddScoped<UserActivityFilter>();
             builder.Services.AddCors();
 
             builder.Services.Configure<ApiBehaviorOptions>(options =>

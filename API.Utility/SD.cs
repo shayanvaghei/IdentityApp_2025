@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace API.Utility
 {
@@ -46,6 +47,7 @@ namespace API.Utility
         public const int RequiredPasswordLength = 6;
         public const int MaxFailedAccessAttempts = 3;
         public const int DefaultLockoutTimeSpanInDays = 1;
+        public const int DefaultDaysToLock = 5;
 
         // Default Password
         public const string DefaultPassword = "123456";
@@ -56,6 +58,19 @@ namespace API.Utility
         public const string Authenticator = "authenticator";
         public const string MFAS = "mfas"; // multi-factor authentication secret
         public const string MFASDisable = "mfasdisable"; // multi-factor authentication secret
+
+        // Pagination rules
+        public const int MaxPageSize = 99;
+        public const int MinPageSize = 5;
+
+        // User actions
+        public const string Active = "active";
+        public const string Inactive = "inactive";
+        public const string Lock = "lock";
+        public const string Unlock = "unlock";
+        public const string Delete = "delete";
+        public const string Block = "block";
+        public const string Unblock = "unblock";
 
         public static string AccountLockedMessage(DateTime endDate)
         {
@@ -75,6 +90,21 @@ namespace API.Utility
             const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             return new string(Enumerable.Repeat(chars, length)
                 .Select(s => s[_random.Next(s.Length)]).ToArray());
+        }
+
+        public static string TrimTrailing(this string name)
+        {
+            if (!string.IsNullOrEmpty(name))
+            {
+                return Regex.Replace(name, @"\s+", " ").Trim();
+            }
+
+            return null;
+        }
+
+        public static DateTime ToUtcFormat(this DateTime date)
+        {
+            return DateTime.SpecifyKind(date, DateTimeKind.Utc);
         }
     }
 }
