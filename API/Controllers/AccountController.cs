@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -112,6 +113,9 @@ namespace API.Controllers
             var result = await UserManager.CreateAsync(userToAdd, model.Password);
             if (!result.Succeeded) return BadRequest(result.Errors);
 
+            result = await UserManager.AddToRoleAsync(userToAdd, SD.UserRole);
+            if (!result.Succeeded) return BadRequest(result.Errors);
+
             try
             {
                 if (await SendConfirmEmailAsync(userToAdd))
@@ -127,18 +131,6 @@ namespace API.Controllers
                 return BadRequest(new ApiResponse(400, title: SM.T_EmailSentFailed,
                     message: SM.M_EmailSentFailed, displayByDefault: true));
             }
-        }
-
-        [HttpGet("name-taken")]
-        public async Task<IActionResult> NameTaken([FromQuery] string name)
-        {
-            return Ok(new { IsTaken = await CheckNameExistsAsync(name) });
-        }
-
-        [HttpGet("email-taken")]
-        public async Task<IActionResult> EmailTaken([FromQuery] string email)
-        {
-            return Ok(new { IsTaken = await CheckEmailExistsAsync(email) });
         }
 
         [Authorize]

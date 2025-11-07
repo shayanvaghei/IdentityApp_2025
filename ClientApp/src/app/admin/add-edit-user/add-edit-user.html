@@ -1,0 +1,162 @@
+@if (completed) {
+<form [formGroup]="form" (ngSubmit)="createOrUpdateUser()" autocomplete="off">
+    <div class="container border p-4">
+        <div class="row text-center">
+            <h1>{{ user ? 'Edit user' :'Add new user' }}</h1>
+        </div>
+        <div class="row">
+            <div class="col-12 col-md-6 offset-md-3 pb-3 position-relative">
+                <label for="name">
+                    Name (Username)
+                </label>
+                <input formControlName="name" type="text" class="form-control" placeholder=""
+                    [class.is-invalid]="(submitted || form.get('name')?.dirty) && form.get('name')?.errors"
+                    [class.is-valid]="form.get('name')?.status === 'VALID'" />
+                @if (form.get('name')?.status === 'PENDING') {
+                <div class="position-absolute top-50 start-50 translate-middle">
+                    <span>Checking...</span>
+                </div>
+                } @else if((submitted || form.get('name')?.dirty) && form.get('name')?.hasError('required')) {
+                <div class="invalid-feedback">
+                    Name is required
+                </div>
+
+                } @else if((submitted || form.get('name')?.dirty) &&
+                form.get('name')?.hasError('minlength') || form.get('name')?.hasError('maxlength')) {
+                <div class="invalid-feedback">
+                    Name must be at least 3, and maximum 15 characters
+                </div>
+                } @else if ((submitted || form.get('name')?.dirty) &&
+                form.get('name')?.hasError('pattern')) {
+                <div class="invalid-feedback">
+                    Name must contain only a-z A-Z 0-9 characters
+                </div>
+                } @else if (form.get('name')?.dirty &&
+                form.get('name')?.hasError('nameTaken')) {
+                <div class="invalid-feedback">
+                    Name is already taken. Please choose a different one.
+                </div>
+                }
+            </div>
+            <div class="col-12 col-md-6 offset-md-3 pb-3 position-relative">
+                <label for="email">
+                    Email
+                </label>
+                <input formControlName="email" type="text" class="form-control" placeholder=""
+                    [class.is-invalid]="(submitted || form.get('email')?.dirty) && form.get('email')?.errors"
+                    [class.is-valid]="form.get('email')?.status === 'VALID'" />
+                @if (form.get('email')?.status === 'PENDING') {
+                <div class="position-absolute top-50 start-50 translate-middle">
+                    <span>Checking...</span>
+                </div>
+                } @else if((submitted || form.get('email')?.dirty) && form.get('email')?.hasError('required')) {
+                <div class="invalid-feedback">
+                    Email is required
+                </div>
+
+                } @else if ((submitted || form.get('email')?.dirty) &&
+                form.get('email')?.hasError('pattern')) {
+                <div class="invalid-feedback">
+                    Invalid email address
+                </div>
+                } @else if (form.get('email')?.dirty &&
+                form.get('email')?.hasError('emailTaken')) {
+                <div class="invalid-feedback">
+                    Email is already taken. Please choose a different one.
+                </div>
+                }
+            </div>
+
+            <div class="col-12 col-md-6 offset-md-3 pb-3 position-relative">
+                <app-form-input [formControl]="$any(form.controls['password'])" [type]="'password'" [label]="'Password'"
+                    [minLength]="6" [maxLength]="16" [submitted]="submitted">
+                </app-form-input>
+                @if (user) {
+                <div>
+                    <span class="text-info fw-bold">Note:</span>
+                    If you don’t intend to change the user’s password, leave the password field empty.
+                </div>
+                }
+            </div>
+
+            <div class="col-12 col-md-6 offset-md-3 pb-3 position-relative">
+                <div class="row">
+                    <div class="col">
+                        <div>
+                            <label class="form-check-label">
+                                Email Confirmed?
+                            </label>
+                        </div>
+
+                        <div class="btn-group">
+                            <input type="radio" class="btn-check" formControlName="emailConfirmed" [value]="true"
+                                id="emailConfirmedTrue">
+                            <label class="btn btn-outline-primary" for="emailConfirmedTrue">True</label>
+
+                            <input type="radio" class="btn-check" formControlName="emailConfirmed" [value]="false"
+                                id="emailConfirmedFalse">
+                            <label class="btn btn-outline-primary" for="emailConfirmedFalse">False</label>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div>
+                            <label class="form-check-label">
+                                Is active?
+                            </label>
+                        </div>
+
+                        <div class="btn-group">
+                            <input type="radio" class="btn-check" formControlName="isActive" [value]="true"
+                                id="isActiveTrue">
+                            <label class="btn btn-outline-primary" for="isActiveTrue">True</label>
+
+                            <input type="radio" class="btn-check" formControlName="isActive" [value]="false"
+                                id="isActiveFalse">
+                            <label class="btn btn-outline-primary" for="isActiveFalse">False</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if (appRoles) {
+            <div class="col-12 col-md-6 offset-md-3 pb-3 position-relative">
+                <label for="roles">Select Roles</label>
+                <ng-select [items]="appRoles" [multiple]="true" bindLabel="name" formControlName="roles"
+                    placeholder="Select roles" [clearable]="true" [closeOnSelect]="false" [searchable]="true"
+                    [class.is-invalid]="submitted && form.get('roles')?.errors"
+                    [class.is-valid]="form.get('roles')?.status === 'VALID'">
+                </ng-select>
+                @if (form.get('roles')?.hasError('atLeastOneRequired') && submitted) {
+                <div class="invalid-feedback">
+                    At least one role must be assigned.
+                </div>
+                }
+            </div>
+            }
+
+            @if (errorMessages.length > 0) {
+            <div class="col-12 col-md-6 offset-md-3 pb-3">
+                <app-validation-message [errorMessages]="errorMessages"></app-validation-message>
+            </div>
+            }
+
+            <div class="row my-4">
+                <div class="col-12 col-md-6 offset-md-3 pb-3">
+                    <div class="row">
+                        <div class="col-md-6 d-grid mt-1">
+                            <button type="button" class="btn btn-lg btn-secondary" routerLink="/admin">
+                                Cancel
+                            </button>
+                        </div>
+                        <div class="col-md-6 d-grid mt-1">
+                            <button class="btn btn-lg btn-primary" type="submit">
+                                {{!user ? 'Create' : 'Update'}}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+}

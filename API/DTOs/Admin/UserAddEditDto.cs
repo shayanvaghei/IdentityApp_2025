@@ -23,7 +23,6 @@ namespace API.DTOs.Admin
             set => _email = value.ToLower();
         }
 
-        [StringLength(15, MinimumLength = 6, ErrorMessage = "Password must be at least {2}, and maximum {1} characters")]
         public string Password { get; set; }
         public bool EmailConfirmed { get; set; }
         public bool IsActive { get; set; }

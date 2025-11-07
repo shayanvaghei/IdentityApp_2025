@@ -3,13 +3,15 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AccountService } from '../account.service';
 import { ValidationMessage } from "../../shared/components/errors/validation-message/validation-message";
+import { FormInput } from '../../shared/components/form-input/form-input';
 
 @Component({
   selector: 'app-login',
   imports: [
     ReactiveFormsModule,
     ValidationMessage,
-    RouterLink
+    RouterLink,
+    FormInput
   ],
   templateUrl: './login.html',
   styleUrl: './login.scss'

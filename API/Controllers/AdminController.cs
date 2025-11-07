@@ -295,6 +295,7 @@ namespace API.Controllers
             AppUser user;
             string message = "";
             int statusCode = 0;
+            IdentityResult result;
 
             if (model.UserId == 0)
             {
@@ -329,11 +330,11 @@ namespace API.Controllers
                     IsActive = model.IsActive
                 };
 
-                var result = await UserManager.CreateAsync(user, model.Password);
+                result = await UserManager.CreateAsync(user, model.Password);
 
                 if (result.Succeeded)
                 {
-                    message = "New user has been created.";
+                    message = $"New user '{user.Name}' has been created.";
                     statusCode = 201;
                 }
                 else
@@ -376,15 +377,34 @@ namespace API.Controllers
 
                 if (!string.IsNullOrEmpty(model.Password))
                 {
-                    await UserManager.RemovePasswordAsync(user);
-                    await UserManager.AddPasswordAsync(user, model.Password);
-                }
+                    if (model.Password.Length < 6 || model.Password.Length > 16)
+                    {
+                        var errors = new List<IdentityError>
+                        {
+                            new IdentityError
+                            {
+                                Code = "PasswordLength",
+                                Description = "Password must be between 6 and 16 characters long."
+                            }
+                        };
 
-                var result = await UserManager.UpdateAsync(user);
+                        result = IdentityResult.Failed(errors.ToArray());
+                    }
+                    else
+                    {
+                        await UserManager.RemovePasswordAsync(user);
+                        await UserManager.AddPasswordAsync(user, model.Password);
+                        result = await UserManager.UpdateAsync(user);
+                    }
+                }
+                else
+                {
+                    result = await UserManager.UpdateAsync(user);
+                }
 
                 if (result.Succeeded)
                 {
-                    message = "The user has been updated.";
+                    message = $"The user '{user.Name}' has been updated.";
                     statusCode = 200;
                 }
                 else
@@ -416,8 +436,23 @@ namespace API.Controllers
             }
             else
             {
-                return BadRequest(new ApiResponse(statusCode, showWithToastr: true));
+                var apiResponse = new ApiResponse(statusCode);
+                apiResponse.Errors = result.Errors.Select(e => e.Description);
+
+                return BadRequest(apiResponse);
             }
+        }
+
+        [HttpGet("name-taken")]
+        public async Task<IActionResult> NameTaken([FromQuery] string name)
+        {
+            return Ok(new { IsTaken = await CheckNameExistsAsync(name) });
+        }
+
+        [HttpGet("email-taken")]
+        public async Task<IActionResult> EmailTaken([FromQuery] string email)
+        {
+            return Ok(new { IsTaken = await CheckEmailExistsAsync(email) });
         }
 
         #region Private Methods
@@ -472,11 +507,11 @@ namespace API.Controllers
 
             if (action.Equals(SD.Lock) && daysToLock != null)
             {
-                messageBody = string.Format(htmlBody, GetClientUrl(), user.UserName, user.Email, user.Name, daysToLock);
+                messageBody = string.Format(htmlBody, GetClientUrl(), user.Name, user.UserName, user.Email, daysToLock);
             }
             else
             {
-                messageBody = string.Format(htmlBody, GetClientUrl(), user.UserName, user.Email, user.Name);
+                messageBody = string.Format(htmlBody, GetClientUrl(), user.Name, user.UserName, user.Email);
             }
 
             var emailSend = new EmailSendDto(user.Email, title, messageBody);

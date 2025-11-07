@@ -1,0 +1,24 @@
+@if (type && entries) {
+<form [formGroup]="form">
+    @if (label) {
+    <label class="form-label me-1">{{label}}</label>
+    }
+    <div class="btn-group" role="group">
+        @if (type == 'dropdown') {
+        <select class="form-select" (change)="onEntriesSelection($event)" formControlName="myfilter">
+            @for (entry of entries; track $index) {
+            <option [value]="entry">
+                {{entry}}
+            </option>
+            }
+        </select>
+        } @else {
+        @for (entry of entries; track $index) {
+        <input type="radio" class="btn-check" formControlName="myfilter" [value]="entry" [id]="action + entry"
+            (change)="onEntriesSelection(entry)">
+        <label class="btn btn-outline-primary" [for]="action + entry">{{entry}}</label>
+        }
+        }
+    </div>
+</form>
+}

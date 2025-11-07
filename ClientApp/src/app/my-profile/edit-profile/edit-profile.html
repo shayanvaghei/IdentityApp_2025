@@ -4,66 +4,67 @@
 </div>
 <div class="card-body">
     <form [formGroup]="form" (ngSubmit)="save()" autocomplete="off">
-        <app-form-input
-            [formControl]="$any(form.controls['name'])"
-            [type]="'text'"
-            [label]="'Name (Username)'"
-            [submitted]="submitted"
-            [minLength]="3"
-            [maxLength]="15"
-            [invalidMessage]="'Name must contain only a-z A-Z 0-9 characters'"
-        ></app-form-input>
+        <div class="row">
+            <div class="col-12 col-lg-6 pb-3">
+                <app-form-input [formControl]="$any(form.controls['name'])" [type]="'text'" [label]="'Name (Username)'"
+                    [submitted]="submitted" [minLength]="3" [maxLength]="15"
+                    [invalidMessage]="'Name must contain only a-z A-Z 0-9 characters'"></app-form-input>
+            </div>
+        </div>
 
-        <app-form-input
-            [formControl]="$any(form.controls['email'])"
-            [type]="'email'"
-            [label]="'Email'"
-            [submitted]="submitted"
-        ></app-form-input>
+        <div class="row">
+            <div class="col-12 col-lg-6 pb-3">
+                <app-form-input [formControl]="$any(form.controls['email'])" [type]="'email'" [label]="'Email'"
+                    [submitted]="submitted"></app-form-input>
+            </div>
+        </div>
+
+
 
         @if (editMode) {
-            <app-form-input
-                [formControl]="$any(form.controls['currentPassword'])"
-                [type]="'password'"
-                [label]="'Current password'"
-                [submitted]="submitted">
-            </app-form-input>
+        <div class="row">
+            <div class="col-12 col-lg-6 pb-3">
+                <app-form-input [formControl]="$any(form.controls['currentPassword'])" [type]="'password'"
+                    [label]="'Current password'" [submitted]="submitted">
+                </app-form-input>
+            </div>
+        </div>
         }
 
         @if (errorMessages.length > 0) {
-            <div class="row">
-                <div class="col">
-                    <app-validation-message [errorMessages]="errorMessages"></app-validation-message>
-                </div>
+        <div class="row">
+            <div class="col">
+                <app-validation-message [errorMessages]="errorMessages"></app-validation-message>
             </div>
+        </div>
         }
 
         <div class="row mt-3">
             <div class="col-lg-6 col">
                 <div class="row">
                     @if(!editMode) {
-                        <div class="col-6">
-                            <div class="d-grid">
-                                <button class="btn btn-block btn-secondary" type="button" (click)="edit()">
-                                    Edit
-                                </button>
-                            </div>
+                    <div class="col-6">
+                        <div class="d-grid">
+                            <button class="btn btn-block btn-secondary" type="button" (click)="edit()">
+                                Edit
+                            </button>
                         </div>
+                    </div>
                     } @else {
-                        <div class="col-6">
-                            <div class="d-grid">
-                                <button class="btn btn-block btn-secondary" type="button" (click)="cancel()">
-                                    Cancel
-                                </button>
-                            </div>
+                    <div class="col-6">
+                        <div class="d-grid">
+                            <button class="btn btn-block btn-secondary" type="button" (click)="cancel()">
+                                Cancel
+                            </button>
                         </div>
-                         <div class="col-6">
-                            <div class="d-grid">
-                                <button class="btn btn-block btn-primary" type="submit">
-                                    Save
-                                </button>
-                            </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-grid">
+                            <button class="btn btn-block btn-primary" type="submit">
+                                Save
+                            </button>
                         </div>
+                    </div>
                     }
                 </div>
             </div>

@@ -11,6 +11,7 @@ import { ConfirmEmailModel, EmailModel } from '../shared/models/account/confirmE
 import { ResetPasswordModel } from '../shared/models/account/resetPassword_m';
 import { MfaVerifyModel } from '../shared/models/account/mfaVerify_m';
 import { MfaDisableModel } from '../shared/models/account/mfaDisable_m';
+import { jwtDecode } from "jwt-decode";
 
 @Injectable({
   providedIn: 'root'
@@ -66,14 +67,6 @@ export class AccountService {
     return this.http.post<ApiResponse<any>>(environment.apiUrl + 'account/register', model);
   }
 
-  checkNameTaken(name: string) {
-    return this.http.get(environment.apiUrl + 'account/name-taken?name=' + name);
-  }
-
-  checkEmailTaken(email: string) {
-    return this.http.get(environment.apiUrl + 'account/email-taken?email=' + email);
-  }
-
   logout() {
     return this.http.post<{}>(this.apiUrl + 'account/logout', {})
       .pipe(
@@ -108,6 +101,12 @@ export class AccountService {
   }
 
   setUser(user: UserModel | null) {
+    if (user) {
+      const decoded: any = jwtDecode(user.jwt);
+      const userRoles = Array.isArray(decoded.role) ? decoded.role : [decoded.role];
+      user.roles = userRoles;
+    }
+
     this.$user.set(user);
   }
 }

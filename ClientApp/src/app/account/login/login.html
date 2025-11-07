@@ -5,24 +5,12 @@
         </div>
         <div class="row">
             <div class="col-12 col-md-6 offset-md-3 pb-3">
-                <label for="userName">Username</label>
-                <input formControlName="userName" type="text" class="form-control" placeholder=""
-                    [class.is-invalid]="submitted && form.get('userName')?.hasError('required')" />
-                @if (submitted && form.get('userName')?.hasError('required')) {
-                <div class="text-danger">
-                    Username is required
-                </div>
-                }
+                <app-form-input [formControl]="$any(form.controls['userName'])" [type]="'text'"
+                    [label]="'Username or email'" [submitted]="submitted"></app-form-input>
             </div>
             <div class="col-12 col-md-6 offset-md-3 pb-3">
-                <label for="password">Password</label>
-                <input formControlName="password" type="password" class="form-control" placeholder=""
-                    [class.is-invalid]="submitted && form.get('password')?.hasError('required')" />
-                @if (submitted && form.get('password')?.hasError('required')) {
-                <div class="text-danger">
-                    Password is required
-                </div>
-                }
+                <app-form-input [formControl]="$any(form.controls['password'])" [type]="'password'" [label]="'Password'"
+                    [submitted]="submitted"></app-form-input>
             </div>
 
             @if (errorMessages.length > 0) {

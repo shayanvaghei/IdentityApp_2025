@@ -39,6 +39,7 @@
               "./node_modules/bootswatch/dist/litera/bootstrap.min.css",
               "./node_modules/bootstrap-icons/font/bootstrap-icons.css",
               "./node_modules/ngx-toastr/toastr.css",
+              "./node_modules/@ng-select/ng-select/themes/default.theme.css",
               "src/styles.scss"
             ]
           },

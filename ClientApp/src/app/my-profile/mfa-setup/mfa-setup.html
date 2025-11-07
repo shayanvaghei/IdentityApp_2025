@@ -26,8 +26,12 @@
         </div>
         }
 
-        <app-form-input [formControl]="$any(form.controls['currentPassword'])" [type]="'password'"
-            [label]="'Current Password'" [submitted]="submitted"></app-form-input>
+        <div class="row">
+            <div class="col-12 col-lg-6 pb-3">
+                <app-form-input [formControl]="$any(form.controls['currentPassword'])" [type]="'password'"
+                    [label]="'Current Password'" [submitted]="submitted"></app-form-input>
+            </div>
+        </div>
 
         @if (errorMessages.length > 0) {
         <div class="row">

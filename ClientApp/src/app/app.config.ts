@@ -9,6 +9,8 @@ import { CoreService } from './core/core.service';
 import { lastValueFrom } from 'rxjs';
 import { credentialInterceptor } from './core/interceptors/credential-interceptor';
 import { errorInterceptor } from './core/interceptors/error-interceptor';
+import { TimeagoModule } from 'ngx-timeago';
+import { importProvidersFrom } from '@angular/core';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -16,6 +18,7 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideAnimationsAsync(),
+    importProvidersFrom(TimeagoModule.forRoot()),
     provideToastr({
       timeOut: 3000,
       positionClass: 'toast-bottom-right',

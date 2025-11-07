@@ -1,0 +1,165 @@
+@if (paginatedResult) {
+<div class="d-flex justify-content-between mb-2">
+    <a class="btn btn-primary" routerLink="/admin/add-edit-user">
+        Create User
+    </a>
+    <button class="btn btn-outline-secondary" (click)="onClearFilters()">Clear Filter</button>
+</div>
+<div class="row mb-4">
+    <div class="col-lg-8 mt-1">
+        <div class="row">
+            <div class="col-lg-4 mt-1">
+                <app-ia-pagination-dropdown-radio-filter [type]="'radio'" [action]="'lockUnlock'"
+                    [entries]="['All', 'Lock', 'Unlock']" [defaultValue]="'All'"
+                    (selectedValue)="onDropdownRadioFilterEntries($event)">
+                </app-ia-pagination-dropdown-radio-filter>
+            </div>
+            <div class="col-lg-4 mt-1">
+                <app-ia-pagination-dropdown-radio-filter [type]="'radio'" [action]="'activation'"
+                    [entries]="['All', 'Active', 'Inactive']" [defaultValue]="'All'"
+                    (selectedValue)="onDropdownRadioFilterEntries($event)">
+                </app-ia-pagination-dropdown-radio-filter>
+            </div>
+            @if (appRoles) {
+            <div class="col-lg-4 mt-1">
+                <ng-select [items]="appRoles" [multiple]="true" bindLabel="name" [(ngModel)]="roles"
+                    (change)="onRoleSelection()" placeholder="Select Roles" [clearable]="true" [closeOnSelect]="false"
+                    [searchable]="true">
+                </ng-select>
+            </div>
+            }
+
+        </div>
+    </div>
+    <div class="col-lg-4 mt-1 d-flex justify-content-end">
+        <app-ia-pagination-search-input (searchOutput)="onReceivedSearchInput($event)"></app-ia-pagination-search-input>
+    </div>
+</div>
+
+<section class="border rounded">
+    <div class="table-responsive-xl">
+        <table class="table table-striped">
+            <thead>
+                <tr class="table-primary">
+                    <th>
+                        <app-ia-pagination-th [label]="'UserId'" [sortByValue]="'id'" [isSortable]="true"
+                            (sortBy)="onSortBy($event)"></app-ia-pagination-th>
+                    </th>
+                    <th>
+                        <app-ia-pagination-th [label]="'Name'" [sortByValue]="'name'" [isSortable]="true"
+                            (sortBy)="onSortBy($event)"></app-ia-pagination-th>
+                    </th>
+                    <th>
+                        <app-ia-pagination-th [label]="'Email'" [sortByValue]="'email'" [isSortable]="true"
+                            (sortBy)="onSortBy($event)"></app-ia-pagination-th>
+                    </th>
+                    <th>
+                        <app-ia-pagination-th [label]="'Created'" [sortByValue]="'created'" [isSortable]="true"
+                            (sortBy)="onSortBy($event)"></app-ia-pagination-th>
+                    </th>
+                    <th>
+                        <app-ia-pagination-th [label]="'Activity'" [sortByValue]="'lastactivity'" [isSortable]="true"
+                            (sortBy)="onSortBy($event)"></app-ia-pagination-th>
+                    </th>
+                    <th>
+                        <app-ia-pagination-th [label]="'Locked'" [isSortable]="false"
+                            (sortBy)="onSortBy($event)"></app-ia-pagination-th>
+                    </th>
+                    <th>
+                        <app-ia-pagination-th [label]="'Active'" [isSortable]="false"
+                            (sortBy)="onSortBy($event)"></app-ia-pagination-th>
+                    </th>
+                    <th>Roles</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (paginatedResult.items.length == 0) {
+                <tr>
+                    <td colspan="12" class="text-center">
+                        No results were found.
+                    </td>
+                </tr>
+                } @else {
+                @for (user of paginatedResult.items; track $index) {
+                <tr>
+                    <td>{{ user.userId }}</td>
+                    <td>{{ user.name }}</td>
+                    <td>
+                        {{ user.email }}
+                        @if (user.emailConfirmed) {
+                        <i class="bi bi-check-circle-fill text-success" ngbTooltip="Email address is confirmed"
+                            placement="top"></i>
+                        } @else {
+                        <i class="bi bi-x-circle-fill text-danger" ngbTooltip="Email address is not confirmed"
+                            placement="top"></i>
+                        }
+                    </td>
+                    <td>{{ user.createdAt | date }}</td>
+                    <td>{{ user.lastActivity ? (user.lastActivity | timeago) : '—' }}</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            @if (!user.isLocked) {
+                            <button class="btn btn-success btn-sm me-1" [disabled]="!user.isActive"
+                                (click)="onLockUnlockChange(user, user.daysToLock)">
+                                <i class="bi bi-unlock-fill"></i>
+                            </button>
+                            <input type="number" [(ngModel)]="user.daysToLock" [disabled]="!user.isActive"
+                                placeholder="Days" class="form-control form-control-sm" style="width: 80px;" />
+                            } @else {
+                            <button class="btn btn-danger btn-sm me-1" [disabled]="!user.isActive"
+                                (click)="onLockUnlockChange(user)">
+                                <i class="bi bi-lock-fill"></i>
+                            </button>
+                            <span>{{user.lockoutEnd | date}}</span>
+                            }
+                        </div>
+                    </td>
+                    <td>
+                        <button class="btn  btn-sm" [ngClass]="user.isActive ? 'btn-success' : 'btn-danger'"
+                            type="button" (click)="onActivateDeactivateChange(user)">
+                            <i class="bi" [ngClass]="user.isActive ? 'bi-check-lg' : 'bi-x-lg'"></i>
+                        </button>
+                    </td>
+                    <td>
+                        {{ user.csvRoles }}
+                    </td>
+                    <td>
+                        <div class="row">
+                            <div class="col">
+                                <div class="d-flex pt-2">
+                                    <a class="btn btn-secondary btn-sm me-1" type="button" ngbTooltip="Edit"
+                                        placement="top" routerLink="/admin/add-edit-user/{{user.userId}}">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button class="btn btn-danger btn-sm me-1" type="button" ngbTooltip="Delete"
+                                        placement="top" (click)="onDeleteUser(user)">
+                                        <i class="bi bi-trash3"></i>
+                                    </button>
+                                    <button class="btn btn-warning btn-sm me-1" type="button"
+                                        ngbTooltip="Resend email confirmation link" placement="top"
+                                        (click)="onSendEmailConfirmationLink(user)">
+                                        <i class="bi bi-envelope"></i>
+                                    </button>
+                                    <button class="btn btn-dark btn-sm" type="button"
+                                        ngbTooltip="Send Change Password Link" placement="top"
+                                        (click)="onSendForgotUsernameOrPasswordEmailLink(user)">
+                                        <i class="bi bi-key"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <app-ia-pagination [totalItemsCount]="paginatedResult.totalItemsCount" [pageNumber]="paginatedResult.pageNumber"
+        [pageSize]="paginatedResult.pageSize" [totalPages]="paginatedResult.totalPages"
+        (pageNumberChanged)="onPageNumberChanged($event)"
+        (pageSizeChanged)="onPageSizeChanged($event)"></app-ia-pagination>
+</section>
+}

@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { CodeInput } from '../../shared/components/code-input/code-input';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -8,15 +7,16 @@ import { AccountService } from '../account.service';
 import { SharedService } from '../../shared/shared.service';
 import { matchValues } from '../../shared/sharedHelper';
 import { ResetPasswordModel } from '../../shared/models/account/resetPassword_m';
+import { FormInput } from '../../shared/components/form-input/form-input';
 
 @Component({
   selector: 'app-reset-password',
   imports: [
-    CommonModule,
     CodeInput,
     ReactiveFormsModule,
     ValidationMessage,
-    RouterLink
+    RouterLink,
+    FormInput
   ],
   templateUrl: './reset-password.html',
   styleUrl: './reset-password.scss'

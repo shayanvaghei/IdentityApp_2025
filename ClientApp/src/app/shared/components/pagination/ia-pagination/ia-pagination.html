@@ -1,0 +1,50 @@
+@if (totalItemsCount && pageNumber && pageSize && totalPages) {
+<div class="d-flex justify-content-end my-3 me-1">
+    <div class="btn-group me-3" ngbDropdown>
+        <button id="button-animated" ngbDropdownToggle type="button" class="btn btn-secondary dropdown-toggle">
+            Items: {{pageSize}}<span class="caret"></span>
+        </button>
+        <div ngbDropdownMenu style="width: 30px !important; ">
+            @for (value of pageSizeValues; track $index) {
+            <button ngbDropdownItem type="button" (click)="onPageSizeChange(value)" [class.active]="value == pageSize">
+                {{value}}
+            </button>
+            }
+        </div>
+    </div>
+    <ul class="navbar-nav me-3">
+        <li class="nav-item">
+            <span class="nav-link" id="itemsPerPageDisplay">
+                {{(pageNumber - 1) * pageSize + 1}}
+                -
+                {{pageNumber * pageSize > totalItemsCount
+                ? totalItemsCount
+                : pageNumber * pageSize}}
+                of
+                {{totalItemsCount}}
+            </span>
+        </li>
+    </ul>
+    <div id="paginationBtnGroup" class="btn-group">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="bottom"
+            title="First" [disabled]="pageNumber == 1" (click)="onPageNumberChange(1)">
+            <i class="bi bi-chevron-bar-left"></i>
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="bottom"
+            title="Previous" [disabled]="pageNumber == 1" (click)="onPageNumberChange(pageNumber - 1)">
+            <i class="bi bi-chevron-left"></i>
+        </button>
+        <button type="button" [disabled]="true" class="btn btn-primary btn-sm">
+            {{pageNumber}}
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="bottom"
+            title="Next" [disabled]="pageNumber == totalPages" (click)="onPageNumberChange(pageNumber + 1)">
+            <i class="bi bi-chevron-right"></i>
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" data-bs-placement="bottom"
+            title="Last" [disabled]="pageNumber == totalPages" (click)="onPageNumberChange(totalPages)">
+            <i class="bi bi-chevron-bar-right"></i>
+        </button>
+    </div>
+</div>
+}

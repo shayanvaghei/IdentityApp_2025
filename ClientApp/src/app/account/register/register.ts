@@ -1,20 +1,19 @@
 import { Component, OnInit } from '@angular/core';
-import { AbstractControl, AsyncValidatorFn, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ValidationMessage } from '../../shared/components/errors/validation-message/validation-message';
-import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { AccountService } from '../account.service';
 import { SharedService } from '../../shared/shared.service';
-import { map, of, switchMap, timer } from 'rxjs';
 import { matchValues } from '../../shared/sharedHelper';
+import { FormInput } from '../../shared/components/form-input/form-input';
 
 @Component({
   selector: 'app-register',
   imports: [
     ReactiveFormsModule,
     ValidationMessage,
-    CommonModule,
-    RouterLink
+    RouterLink,
+    FormInput
   ],
   templateUrl: './register.html',
   styleUrl: './register.scss'
@@ -41,8 +40,8 @@ export class Register implements OnInit {
   initializeForm() {
     this.form = this.formBuilder.group({
       name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(15),
-      Validators.pattern('^[a-zA-Z][a-zA-Z0-9]*$')], [this.checkNameNotTaken()]],
-      email: ['', [Validators.required, Validators.pattern('^.+@[^\\.].*\\.[a-z]{2,}$')], [this.checkEmailNotTaken()]],
+      Validators.pattern('^[a-zA-Z][a-zA-Z0-9]*$')]],
+      email: ['', [Validators.required, Validators.pattern('^.+@[^\\.].*\\.[a-z]{2,}$')]],
       password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(15)]],
       confirmPassword: ['', [Validators.required, matchValues('password')]]
     });
@@ -74,50 +73,4 @@ export class Register implements OnInit {
       })
     }
   }
-
-  // #region Private Methods
-  private checkNameNotTaken(): AsyncValidatorFn {
-    return control => {
-      return timer(500).pipe(
-        switchMap(_ => {
-          if (!control.value) {
-            return of(null);
-          }
-
-          return this.accountService.checkNameTaken(control.value).pipe(
-            map((res: any) => {
-              if (res && res.isTaken) {
-                return { nameTaken: true };
-              }
-
-              return null;
-            })
-          )
-        })
-      )
-    }
-  }
-
-  private checkEmailNotTaken(): AsyncValidatorFn {
-    return control => {
-      return timer(500).pipe(
-        switchMap(_ => {
-          if (!control.value) {
-            return of(null);
-          }
-
-          return this.accountService.checkEmailTaken(control.value).pipe(
-            map((res: any) => {
-              if (res && res.isTaken) {
-                return { emailTaken: true };
-              }
-
-              return null;
-            })
-          )
-        })
-      )
-    }
-  }
-  // #endregion
 }

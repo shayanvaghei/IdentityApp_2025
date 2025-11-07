@@ -1,0 +1,9 @@
+@if (label) {
+<div (click)="toggleArrow()" [class.pointer]="isSortable" class="d-flex">
+    {{label}}
+    @if (isSortable) {
+    <i class="bi pointer"
+        [ngClass]="arrowUp === undefined ? 'bi-dot' : (arrowUp === true ? 'bi-arrow-up-short' : 'bi-arrow-down-short')"></i>
+    }
+</div>
+}

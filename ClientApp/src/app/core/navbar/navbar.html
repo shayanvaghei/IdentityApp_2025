@@ -1,6 +1,32 @@
-<nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
+@if (accountService.$user()) {
+<nav class="navbar navbar-expand-lg bg-dark" data-bs-theme="dark" *appUserHasRoles="'admin,moderator'">
     <div class="container">
         <a class="navbar-brand">
+            <strong>Staff Zone</strong>
+        </a>
+        <button class="navbar-toggler" type="button" (click)="toggleCollapsed()">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" [ngClass]="{'collapse': collapsed}">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item" *appUserHasRoles="'admin'">
+                    <a class="nav-link text-white" routerLink="/admin" routerLinkActive="active">
+                        Admin
+                    </a>
+                </li>
+                <li class="nav-item" *appUserHasRoles="'admin,moderator'">
+                    <a class="nav-link text-white" routerLink="/moderator" routerLinkActive="active">
+                        Moderator
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+}
+<nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
+    <div class="container">
+        <a class="navbar-brand" routerLink="/">
             <strong>IdentityApp</strong>
         </a>
         <button class="navbar-toggler" type="button" (click)="toggleCollapsed()">
@@ -26,9 +52,9 @@
             @if (accountService.$user(); as user) {
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <span class="h4 text-warning me-2 pointer" routerLink="/my-profile/edit-profile">
+                    <a class="h4 text-warning me-2 pointer" routerLink="/my-profile/edit-profile">
                         {{user.name}}
-                    </span>
+                    </a>
                     <a class="btn btn-secondary" (click)="logout()">
                         <i class="bi bi-box-arrow-in-left"></i> Logout
                     </a>
